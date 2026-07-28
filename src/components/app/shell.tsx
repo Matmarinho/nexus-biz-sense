@@ -9,10 +9,7 @@ import {
   LogOut,
   Moon,
   Plus,
-  Settings,
-  Shield,
   Sun,
-  Users,
   Wallet,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -35,8 +32,6 @@ import { useWorkspace } from "./workspace";
 const NAV = [
   { to: "/dashboard", label: "Visão executiva", icon: LayoutDashboard, module: "dashboard" as const },
   { to: "/financeiro", label: "Financeiro", icon: Wallet, module: "finance" as const },
-  { to: "/equipe", label: "Equipe e acessos", icon: Users, module: "users" as const },
-  { to: "/configuracoes", label: "Configurações", icon: Settings, module: "settings" as const },
 ];
 
 function initials(name?: string | null, email?: string | null) {
@@ -99,13 +94,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
-          {ws.isSuperadmin && (
-            <Link
-              to="/admin"
-              className={cn(
-                "mt-1 flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-                pathname.startsWith("/admin") && "bg-accent text-foreground",
-              )}
             >
               <Shield className="size-4" />
               Console supremo
@@ -181,9 +169,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   </Badge>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => navigate({ to: "/configuracoes" })}>
-                  <Settings className="size-4" /> Preferências
-                </DropdownMenuItem>
                 <DropdownMenuItem onSelect={() => setTheme(theme === "system" ? "dark" : "system")}>
                   <Moon className="size-4" /> Tema: {theme === "system" ? "sistema" : theme}
                 </DropdownMenuItem>
