@@ -1,0 +1,290 @@
+import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { z } from "zod";
+import { writeAudit } from "./audit.server";
+
+const uuid = z.string().uuid();
+
+export const loadFinanceWorkspace = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ tenantId: uuid }).parse(d))
+  .handler(async ({ data, context }) => {
+    const s = context.supabase;
+    const t = data.tenantId;
+    const [accounts, categories, costCenters, parties, transactions, transfers, alerts, recurring] =
+      await Promise.all([
+        s.from("bank_accounts").select("*").eq("tenant_id", t).order("name"),
+        s.from("financial_categories").select("*").eq("tenant_id", t).order("name"),
+        s.from("cost_centers").select("*").eq("tenant_id", t).order("name"),
+        s.from("customers_vendors").select("*").eq("tenant_id", t).order("name"),
+        s
+          .from("financial_transactions")
+          .select("*")
+          .eq("tenant_id", t)
+          .order("due_date", { ascending: false })
+          .limit(5000),
+        s.from("transfers").select("*").eq("tenant_id", t).order("transfer_date", { ascending: false }).limit(500),
+        s.from("alerts").select("*").eq("tenant_id", t).neq("status", "resolved").order("created_at", { ascending: false }),
+        s.from("recurring_rules").select("*").eq("tenant_id", t).eq("is_active", true),
+      ]);
+
+    return {
+      accounts: accounts.data ?? [],
+      categories: categories.data ?? [],
+      costCenters: costCenters.data ?? [],
+      parties: parties.data ?? [],
+      transactions: transactions.data ?? [],
+      transfers: transfers.data ?? [],
+      alerts: alerts.data ?? [],
+      recurring: recurring.data ?? [],
+    };
+  });
+
+const transactionSchema = z.object({
+  id: uuid.optional(),
+  tenant_id: uuid,
+  direction: z.enum(["income", "expense"]),
+  status: z.enum(["pending", "paid", "canceled"]).default("pending"),
+  amount: z.number().nonnegative().max(1_000_000_000),
+  due_date: z.string().min(8).max(10),
+  payment_date: z.string().min(8).max(10).nullable().optional(),
+  description: z.string().min(1).max(240),
+  doc_number: z.string().max(60).nullable().optional(),
+  payment_method: z.string().max(40).nullable().optional(),
+  notes: z.string().max(2000).nullable().optional(),
+  bank_account_id: uuid.nullable().optional(),
+  party_id: uuid.nullable().optional(),
+  category_id: uuid.nullable().optional(),
+  cost_center_id: uuid.nullable().optional(),
+});
+
+export const saveTransaction = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => transactionSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    const { id, ...values } = data;
+    if (values.status === "paid" && !values.payment_date) values.payment_date = values.due_date;
+    if (values.status !== "paid") values.payment_date = null;
+
+    const query = id
+      ? context.supabase.from("financial_transactions").update(values).eq("id", id).eq("tenant_id", values.tenant_id)
+      : context.supabase
+          .from("financial_transactions")
+          .insert({ ...values, created_by: context.userId });
+    const { error } = await query;
+    if (error) throw new Error(error.message);
+
+    await writeAudit({
+      tenantId: values.tenant_id,
+      userId: context.userId,
+      action: id ? "transaction.update" : "transaction.create",
+      entity: "financial_transactions",
+      entityId: id ?? null,
+      changes: values,
+    });
+    return { ok: true };
+  });
+
+export const setTransactionStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        tenantId: uuid,
+        id: uuid,
+        status: z.enum(["pending", "paid", "canceled"]),
+        payment_date: z.string().min(8).max(10).nullable().optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("financial_transactions")
+      .update({
+        status: data.status,
+        payment_date:
+          data.status === "paid" ? (data.payment_date ?? new Date().toISOString().slice(0, 10)) : null,
+      })
+      .eq("id", data.id)
+      .eq("tenant_id", data.tenantId);
+    if (error) throw new Error(error.message);
+    await writeAudit({
+      tenantId: data.tenantId,
+      userId: context.userId,
+      action: "transaction.status",
+      entity: "financial_transactions",
+      entityId: data.id,
+      changes: { status: data.status },
+    });
+    return { ok: true };
+  });
+
+export const deleteTransaction = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => z.object({ tenantId: uuid, id: uuid }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("financial_transactions")
+      .delete()
+      .eq("id", data.id)
+      .eq("tenant_id", data.tenantId);
+    if (error) throw new Error(error.message);
+    await writeAudit({
+      tenantId: data.tenantId,
+      userId: context.userId,
+      action: "transaction.delete",
+      entity: "financial_transactions",
+      entityId: data.id,
+    });
+    return { ok: true };
+  });
+
+const ENTITY_TABLES = {
+  bank_accounts: z.object({
+    name: z.string().min(1).max(120),
+    bank_name: z.string().max(120).nullable().optional(),
+    account_type: z.enum(["checking", "savings", "cash", "investment", "card"]),
+    opening_balance: z.number().max(1_000_000_000),
+    currency: z.string().max(5).default("BRL"),
+    color: z.string().max(9).nullable().optional(),
+    is_active: z.boolean().default(true),
+  }),
+  financial_categories: z.object({
+    name: z.string().min(1).max(120),
+    kind: z.enum(["income", "expense"]),
+    color: z.string().max(9).nullable().optional(),
+  }),
+  cost_centers: z.object({
+    name: z.string().min(1).max(120),
+    code: z.string().max(30).nullable().optional(),
+  }),
+  customers_vendors: z.object({
+    name: z.string().min(1).max(160),
+    type: z.enum(["customer", "vendor", "both"]),
+    tax_id: z.string().max(40).nullable().optional(),
+    email: z.string().max(160).nullable().optional(),
+    phone: z.string().max(40).nullable().optional(),
+    notes: z.string().max(2000).nullable().optional(),
+    is_active: z.boolean().default(true),
+  }),
+} as const;
+
+type EntityTable = keyof typeof ENTITY_TABLES;
+
+export const saveEntity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => {
+    const base = z
+      .object({
+        table: z.enum(["bank_accounts", "financial_categories", "cost_centers", "customers_vendors"]),
+        tenantId: uuid,
+        id: uuid.optional(),
+        values: z.record(z.string(), z.unknown()),
+      })
+      .parse(d);
+    const values = ENTITY_TABLES[base.table as EntityTable].parse(base.values);
+    return { ...base, values };
+  })
+  .handler(async ({ data, context }) => {
+    const payload = { ...data.values, tenant_id: data.tenantId } as never;
+    const query = data.id
+      ? context.supabase.from(data.table).update(payload).eq("id", data.id).eq("tenant_id", data.tenantId)
+      : context.supabase.from(data.table).insert({ ...(payload as object), created_by: context.userId } as never);
+    const { error } = await query;
+    if (error) throw new Error(error.message);
+    await writeAudit({
+      tenantId: data.tenantId,
+      userId: context.userId,
+      action: data.id ? `${data.table}.update` : `${data.table}.create`,
+      entity: data.table,
+      entityId: data.id ?? null,
+      changes: data.values,
+    });
+    return { ok: true };
+  });
+
+export const deleteEntity = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        table: z.enum(["bank_accounts", "financial_categories", "cost_centers", "customers_vendors"]),
+        tenantId: uuid,
+        id: uuid,
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from(data.table)
+      .delete()
+      .eq("id", data.id)
+      .eq("tenant_id", data.tenantId);
+    if (error) throw new Error(error.message);
+    await writeAudit({
+      tenantId: data.tenantId,
+      userId: context.userId,
+      action: `${data.table}.delete`,
+      entity: data.table,
+      entityId: data.id,
+    });
+    return { ok: true };
+  });
+
+export const saveTransfer = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        tenantId: uuid,
+        from_account_id: uuid,
+        to_account_id: uuid,
+        amount: z.number().positive(),
+        transfer_date: z.string().min(8).max(10),
+        description: z.string().max(240).nullable().optional(),
+      })
+      .refine((v) => v.from_account_id !== v.to_account_id, {
+        message: "As contas de origem e destino devem ser diferentes.",
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { tenantId, ...values } = data;
+    const { error } = await context.supabase
+      .from("transfers")
+      .insert({ ...values, tenant_id: tenantId, created_by: context.userId });
+    if (error) throw new Error(error.message);
+    await writeAudit({
+      tenantId,
+      userId: context.userId,
+      action: "transfer.create",
+      entity: "transfers",
+      changes: values,
+    });
+    return { ok: true };
+  });
+
+export const updateAlertStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        tenantId: uuid,
+        id: uuid,
+        status: z.enum(["open", "read", "snoozed", "resolved"]),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { error } = await context.supabase
+      .from("alerts")
+      .update({
+        status: data.status,
+        snoozed_until:
+          data.status === "snoozed" ? new Date(Date.now() + 7 * 864e5).toISOString() : null,
+      })
+      .eq("id", data.id)
+      .eq("tenant_id", data.tenantId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
