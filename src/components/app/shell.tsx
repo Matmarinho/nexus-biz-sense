@@ -94,11 +94,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
-            >
-              <Shield className="size-4" />
-              Console supremo
-            </Link>
-          )}
         </nav>
 
         <div className="rounded-xl border border-border/60 bg-surface-2/60 p-3 text-xs text-muted-foreground">
