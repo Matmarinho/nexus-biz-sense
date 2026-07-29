@@ -19,7 +19,7 @@ export const toneOf = (v: number | null | undefined) =>
 
 export function formatDate(value?: string | null) {
   if (!value) return "—";
-  const d = new Date(`${value}T00:00:00`);
+  const d = new Date(value.length <= 10 ? `${value}T00:00:00` : value);
   if (Number.isNaN(d.getTime())) return "—";
   return new Intl.DateTimeFormat("pt-BR").format(d);
 }

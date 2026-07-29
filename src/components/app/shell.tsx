@@ -3,13 +3,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import {
   Building2,
   ChevronsUpDown,
+  Crown,
   Eye,
   EyeOff,
   LayoutDashboard,
   LogOut,
   Moon,
   Plus,
+  Settings,
   Sun,
+  Users,
   Wallet,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -32,6 +35,8 @@ import { useWorkspace } from "./workspace";
 const NAV = [
   { to: "/dashboard", label: "Visão executiva", icon: LayoutDashboard, module: "dashboard" as const },
   { to: "/financeiro", label: "Financeiro", icon: Wallet, module: "finance" as const },
+  { to: "/equipe", label: "Equipe e acessos", icon: Users, module: "users" as const },
+  { to: "/configuracoes", label: "Configurações", icon: Settings, module: "settings" as const },
 ];
 
 function initials(name?: string | null, email?: string | null) {
@@ -94,6 +99,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </Link>
             );
           })}
+          {ws.isSuperadmin && (
+            <Link
+              to="/console"
+              className={cn(
+                "mt-2 flex items-center gap-3 rounded-lg border border-primary/30 px-3 py-2 text-sm text-primary transition-colors hover:bg-primary/10",
+                pathname.startsWith("/console") && "bg-primary/10",
+              )}
+            >
+              <Crown className="size-4" />
+              Console supremo
+            </Link>
+          )}
         </nav>
 
         <div className="rounded-xl border border-border/60 bg-surface-2/60 p-3 text-xs text-muted-foreground">

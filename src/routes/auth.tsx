@@ -35,6 +35,8 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
+  const [mfaFactorId, setMfaFactorId] = useState<string | null>(null);
+  const [otp, setOtp] = useState("");
 
   useEffect(() => {
     document.documentElement.classList.add("dark");
@@ -47,9 +49,50 @@ function AuthPage() {
     e.preventDefault();
     setLoading(true);
     const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) {
+      setLoading(false);
+      return toast.error("Não foi possível entrar", { description: error.message });
+    }
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+    if (aal?.nextLevel === "aal2" && aal.nextLevel !== aal.currentLevel) {
+      const { data: factors } = await supabase.auth.mfa.listFactors();
+      const factor = factors?.totp?.find((f) => f.status === "verified");
+      if (factor) {
+        setLoading(false);
+        setMfaFactorId(factor.id);
+        return;
+      }
+    }
     setLoading(false);
-    if (error) return toast.error("Não foi possível entrar", { description: error.message });
     navigate({ to: "/dashboard", replace: true });
+  }
+
+  async function verifyMfa(e: React.FormEvent) {
+    e.preventDefault();
+    if (!mfaFactorId) return;
+    setLoading(true);
+    const { data: challenge, error: cErr } = await supabase.auth.mfa.challenge({ factorId: mfaFactorId });
+    if (cErr || !challenge) {
+      setLoading(false);
+      return toast.error("Falha no desafio", { description: cErr?.message });
+    }
+    const { error } = await supabase.auth.mfa.verify({
+      factorId: mfaFactorId,
+      challengeId: challenge.id,
+      code: otp,
+    });
+    setLoading(false);
+    if (error) return toast.error("Código inválido", { description: error.message });
+    navigate({ to: "/dashboard", replace: true });
+  }
+
+  async function forgotPassword() {
+    if (!email) return toast.error("Informe seu e-mail para receber o link de recuperação.");
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    if (error) return toast.error("Falha ao enviar", { description: error.message });
+    toast.success("Link enviado", { description: "Verifique sua caixa de entrada para redefinir a senha." });
   }
 
   async function signUp(e: React.FormEvent) {
@@ -81,6 +124,45 @@ function AuthPage() {
     }
     if (result.redirected) return;
     navigate({ to: "/dashboard", replace: true });
+  }
+
+  if (mfaFactorId) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <form onSubmit={verifyMfa} className="glass w-full max-w-md space-y-5 rounded-2xl border border-border/60 p-8">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="size-5 text-primary" />
+            <h1 className="font-display text-xl font-semibold">Verificação em dois fatores</h1>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Digite o código de 6 dígitos do seu aplicativo autenticador.
+          </p>
+          <Input
+            inputMode="numeric"
+            maxLength={6}
+            autoFocus
+            value={otp}
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+            className="numeric text-center text-lg tracking-[0.4em]"
+            placeholder="000000"
+          />
+          <Button type="submit" className="w-full" disabled={otp.length !== 6 || loading}>
+            {loading && <Loader2 className="size-4 animate-spin" />} Confirmar e entrar
+          </Button>
+          <button
+            type="button"
+            className="w-full text-center text-xs text-muted-foreground underline underline-offset-2"
+            onClick={() => {
+              supabase.auth.signOut();
+              setMfaFactorId(null);
+              setOtp("");
+            }}
+          >
+            Usar outra conta
+          </button>
+        </form>
+      </div>
+    );
   }
 
   return (
@@ -151,6 +233,13 @@ function AuthPage() {
                   {loading ? <Loader2 className="size-4 animate-spin" /> : <ArrowRight className="size-4" />}
                   Entrar na plataforma
                 </Button>
+                <button
+                  type="button"
+                  onClick={forgotPassword}
+                  className="w-full text-center text-xs text-muted-foreground underline underline-offset-2 hover:text-foreground"
+                >
+                  Esqueci minha senha
+                </button>
               </form>
             </TabsContent>
 
