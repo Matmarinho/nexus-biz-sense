@@ -126,6 +126,45 @@ function AuthPage() {
     navigate({ to: "/dashboard", replace: true });
   }
 
+  if (mfaFactorId) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <form onSubmit={verifyMfa} className="glass w-full max-w-md space-y-5 rounded-2xl border border-border/60 p-8">
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="size-5 text-primary" />
+            <h1 className="font-display text-xl font-semibold">Verificação em dois fatores</h1>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Digite o código de 6 dígitos do seu aplicativo autenticador.
+          </p>
+          <Input
+            inputMode="numeric"
+            maxLength={6}
+            autoFocus
+            value={otp}
+            onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+            className="numeric text-center text-lg tracking-[0.4em]"
+            placeholder="000000"
+          />
+          <Button type="submit" className="w-full" disabled={otp.length !== 6 || loading}>
+            {loading && <Loader2 className="size-4 animate-spin" />} Confirmar e entrar
+          </Button>
+          <button
+            type="button"
+            className="w-full text-center text-xs text-muted-foreground underline underline-offset-2"
+            onClick={() => {
+              supabase.auth.signOut();
+              setMfaFactorId(null);
+              setOtp("");
+            }}
+          >
+            Usar outra conta
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10">
       <div className="pointer-events-none absolute -top-32 -left-24 size-[28rem] rounded-full bg-primary/25 blur-[120px]" />
