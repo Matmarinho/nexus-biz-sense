@@ -134,7 +134,7 @@ export const listMembers = createServerFn({ method: "POST" })
     const [{ data: members }, { data: invites }] = await Promise.all([
       context.supabase
         .from("tenant_users")
-        .select("id, user_id, role, status, custom_permissions, created_at, profiles:user_id(full_name, email, avatar_url)")
+        .select("id, user_id, role, status, custom_permissions, created_at")
         .eq("tenant_id", data.tenantId)
         .order("created_at"),
       context.supabase
@@ -144,7 +144,17 @@ export const listMembers = createServerFn({ method: "POST" })
         .eq("status", "pending")
         .order("created_at", { ascending: false }),
     ]);
-    return { members: members ?? [], invites: invites ?? [] };
+
+    const ids = (members ?? []).map((m) => m.user_id);
+    const { data: profiles } = ids.length
+      ? await context.supabase.from("profiles").select("id, full_name, email, avatar_url").in("id", ids)
+      : { data: [] };
+    const byId = new Map((profiles ?? []).map((p) => [p.id, p]));
+
+    return {
+      members: (members ?? []).map((m) => ({ ...m, profiles: byId.get(m.user_id) ?? null })),
+      invites: invites ?? [],
+    };
   });
 
 export const inviteMember = createServerFn({ method: "POST" })
@@ -287,7 +297,7 @@ export const listAuditLogs = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { data: logs } = await context.supabase
       .from("audit_logs")
-      .select("*, profiles:user_id(full_name, email)")
+      .select("*")
       .eq("tenant_id", data.tenantId)
       .order("created_at", { ascending: false })
       .limit(200);
