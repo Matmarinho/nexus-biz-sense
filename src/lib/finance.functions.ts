@@ -140,7 +140,6 @@ export const deleteTransaction = createServerFn({ method: "POST" })
   });
 
 const ENTITY_TABLES = {
-  __unused: z.object({}),
   bank_accounts: z.object({
     name: z.string().min(1).max(120),
     bank_name: z.string().max(120).nullable().optional(),
