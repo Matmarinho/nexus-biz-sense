@@ -181,7 +181,10 @@ export const patchTransaction = createServerFn({ method: "POST" })
       seriesId = row?.series_id ?? null;
     }
 
-    const base = context.supabase.from("financial_transactions").update(values).eq("tenant_id", data.tenantId);
+    const base = context.supabase
+      .from("financial_transactions")
+      .update(values as never)
+      .eq("tenant_id", data.tenantId);
     const { error } = seriesId ? await base.eq("series_id", seriesId) : await base.eq("id", data.id);
     if (error) throw new Error(error.message);
 
