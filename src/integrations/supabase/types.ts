@@ -403,11 +403,14 @@ export type Database = {
           doc_number: string | null
           due_date: string
           id: string
+          installment_no: number | null
+          installment_total: number | null
           notes: string | null
           party_id: string | null
           payment_date: string | null
           payment_method: string | null
           recurring_rule_id: string | null
+          series_id: string | null
           status: string
           tenant_id: string
           updated_at: string
@@ -424,11 +427,14 @@ export type Database = {
           doc_number?: string | null
           due_date: string
           id?: string
+          installment_no?: number | null
+          installment_total?: number | null
           notes?: string | null
           party_id?: string | null
           payment_date?: string | null
           payment_method?: string | null
           recurring_rule_id?: string | null
+          series_id?: string | null
           status?: string
           tenant_id: string
           updated_at?: string
@@ -445,11 +451,14 @@ export type Database = {
           doc_number?: string | null
           due_date?: string
           id?: string
+          installment_no?: number | null
+          installment_total?: number | null
           notes?: string | null
           party_id?: string | null
           payment_date?: string | null
           payment_method?: string | null
           recurring_rule_id?: string | null
+          series_id?: string | null
           status?: string
           tenant_id?: string
           updated_at?: string
