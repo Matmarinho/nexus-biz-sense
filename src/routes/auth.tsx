@@ -167,6 +167,7 @@ function AuthPage() {
 
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-10">
+      <VideoBackdrop />
       <div className="pointer-events-none absolute -top-32 -left-24 size-[28rem] rounded-full bg-primary/25 blur-[120px]" />
       <div className="pointer-events-none absolute -bottom-40 -right-16 size-[26rem] rounded-full bg-primary/15 blur-[130px]" />
 
