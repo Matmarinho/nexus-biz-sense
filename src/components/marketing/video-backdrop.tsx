@@ -15,7 +15,7 @@ export function VideoBackdrop({ className, overlay = true }: { className?: strin
         loop
         playsInline
         preload="metadata"
-cursor-default      />
+      />
       {overlay && (
         <>
           <div className="absolute inset-0 bg-[oklch(0.13_0.008_290)]/72" />
