@@ -1,31 +1,40 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ArrowRight, LineChart, ShieldCheck, Wallet } from "lucide-react";
+import { ArrowRight, ChevronDown, PlayCircle } from "lucide-react";
+import { SiteHeader } from "@/components/marketing/site-header";
+import { SiteFooter } from "@/components/marketing/site-footer";
+import { VideoBackdrop } from "@/components/marketing/video-backdrop";
+import {
+  CasesSection,
+  ContatoSection,
+  DashboardSection,
+  DepoimentosSection,
+  EmpresaSection,
+  PlanosSection,
+  PlataformaSection,
+  TecnologiaSection,
+} from "@/components/marketing/sections";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Nexus ERP · Gestão empresarial com inteligência" },
+      { title: "Nexus ERP · Plataforma global de gestão empresarial" },
       {
         name: "description",
         content:
-          "Plataforma multiempresa de gestão financeira com Índice de Saúde Empresarial, fluxo de caixa em tempo real e permissões granulares.",
+          "ERP corporativo multiempresa com IA: financeiro, contratos, CRM, projetos, BI e dashboards em tempo real para empresas privadas e órgãos públicos.",
       },
-      { property: "og:title", content: "Nexus ERP · Gestão empresarial com inteligência" },
+      { property: "og:title", content: "Nexus ERP · Plataforma global de gestão empresarial" },
       {
         property: "og:description",
-        content: "Financeiro, indicadores e previsões em uma plataforma multiempresa segura.",
+        content: "Financeiro, contratos, CRM, BI e inteligência artificial em uma plataforma multiempresa segura.",
       },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
   component: Landing,
 });
-
-const FEATURES = [
-  { icon: Wallet, title: "Financeiro completo", text: "Contas, categorias, recebíveis e obrigações com sinais claros de + e −." },
-  { icon: LineChart, title: "Inteligência de negócio", text: "Índice de Saúde Empresarial, projeções de caixa e alertas automáticos." },
-  { icon: ShieldCheck, title: "Multiempresa seguro", text: "Isolamento total de dados e permissões por módulo e ação." },
-];
 
 function Landing() {
   useEffect(() => {
@@ -33,44 +42,64 @@ function Landing() {
   }, []);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-background">
-      <div className="pointer-events-none absolute -top-40 left-1/3 size-[34rem] rounded-full bg-primary/20 blur-[140px]" />
-      <main className="relative mx-auto max-w-5xl px-6 py-24">
-        <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-surface/60 px-3 py-1 text-xs text-muted-foreground">
-          Plataforma global de gestão empresarial
-        </span>
-        <h1 className="mt-6 max-w-3xl font-display text-4xl leading-tight font-semibold text-balance sm:text-5xl">
-          A gestão da sua empresa, traduzida em decisões.
-        </h1>
-        <p className="mt-5 max-w-2xl text-muted-foreground">
-          Nexus ERP reúne financeiro, indicadores operacionais e previsões em um único painel executivo —
-          com controle total de acessos e suporte a múltiplas empresas.
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            to="/auth"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Acessar plataforma <ArrowRight className="size-4" />
-          </Link>
-          <Link
-            to="/auth"
-            className="inline-flex items-center gap-2 rounded-md border border-border px-5 py-2.5 text-sm font-medium transition-colors hover:bg-accent"
-          >
-            Ver demonstração
-          </Link>
-        </div>
+    <div className="bg-background">
+      <SiteHeader />
 
-        <section className="mt-20 grid gap-4 md:grid-cols-3">
-          {FEATURES.map((f) => (
-            <article key={f.title} className="rounded-xl border border-border/60 bg-surface/60 p-5">
-              <f.icon className="size-5 text-primary" />
-              <h2 className="mt-3 font-medium">{f.title}</h2>
-              <p className="mt-1 text-sm text-muted-foreground">{f.text}</p>
-            </article>
-          ))}
+      <main>
+        <section id="home" className="relative flex min-h-[100svh] items-center overflow-hidden">
+          <VideoBackdrop />
+          <div className="relative mx-auto w-full max-w-[90rem] px-6 pt-28 pb-24 lg:px-10">
+            <span className="glass inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-xs text-muted-foreground">
+              Plataforma global de gestão empresarial com IA
+            </span>
+            <h1 className="mt-7 max-w-4xl font-display text-4xl leading-[1.05] font-semibold text-balance sm:text-6xl xl:text-7xl">
+              A gestão da sua organização, traduzida em decisões.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base text-muted-foreground sm:text-lg">
+              Financeiro, contratos, CRM, projetos, patrimônio e BI em uma única plataforma
+              multiempresa — segura, auditável e pronta para operações globais.
+            </p>
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link
+                to="/auth"
+                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:-translate-y-0.5 hover:bg-primary/90"
+              >
+                Entrar <ArrowRight className="size-4" />
+              </Link>
+              <a
+                href="#contato"
+                className="glass inline-flex items-center gap-2 rounded-xl px-6 py-3 text-sm font-medium transition-all hover:-translate-y-0.5"
+              >
+                Solicitar demonstração
+              </a>
+              <a
+                href="#plataforma"
+                className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-accent"
+              >
+                <PlayCircle className="size-4" /> Conheça a plataforma
+              </a>
+            </div>
+          </div>
+          <a
+            href="#empresa"
+            aria-label="Rolar para a próxima seção"
+            className="absolute bottom-8 left-1/2 -translate-x-1/2 rounded-full border border-border/60 p-2 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <ChevronDown className="size-5" />
+          </a>
         </section>
+
+        <EmpresaSection />
+        <PlataformaSection />
+        <TecnologiaSection />
+        <DashboardSection />
+        <CasesSection />
+        <DepoimentosSection />
+        <PlanosSection />
+        <ContatoSection />
       </main>
+
+      <SiteFooter />
     </div>
   );
 }
