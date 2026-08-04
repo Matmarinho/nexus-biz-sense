@@ -30,7 +30,6 @@ export function VideoBackdrop({ className, overlay = true }: { className?: strin
         poster={heroPoster.url}
         autoPlay
         muted
-        defaultMuted={undefined as never}
         loop
         playsInline
         preload="auto"
