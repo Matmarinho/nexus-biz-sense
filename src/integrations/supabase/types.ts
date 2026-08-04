@@ -255,6 +255,204 @@ export type Database = {
           },
         ]
       }
+      crm_activities: {
+        Row: {
+          created_at: string
+          deal_id: string | null
+          done: boolean
+          due_date: string | null
+          id: string
+          kind: string
+          notes: string | null
+          owner_id: string | null
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id?: string | null
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          kind?: string
+          notes?: string | null
+          owner_id?: string | null
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string | null
+          done?: boolean
+          due_date?: string | null
+          id?: string
+          kind?: string
+          notes?: string | null
+          owner_id?: string | null
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_activities_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "crm_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_activities_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_deals: {
+        Row: {
+          amount: number
+          closed_at: string | null
+          contact_email: string | null
+          contact_name: string | null
+          contact_phone: string | null
+          created_at: string
+          created_by: string | null
+          currency: string
+          expected_close_date: string | null
+          id: string
+          notes: string | null
+          owner_id: string | null
+          party_id: string | null
+          probability: number | null
+          source: string | null
+          stage_id: string | null
+          status: string
+          tags: string[]
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number
+          closed_at?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          expected_close_date?: string | null
+          id?: string
+          notes?: string | null
+          owner_id?: string | null
+          party_id?: string | null
+          probability?: number | null
+          source?: string | null
+          stage_id?: string | null
+          status?: string
+          tags?: string[]
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          closed_at?: string | null
+          contact_email?: string | null
+          contact_name?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          created_by?: string | null
+          currency?: string
+          expected_close_date?: string | null
+          id?: string
+          notes?: string | null
+          owner_id?: string | null
+          party_id?: string | null
+          probability?: number | null
+          source?: string | null
+          stage_id?: string | null
+          status?: string
+          tags?: string[]
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_deals_party_id_fkey"
+            columns: ["party_id"]
+            isOneToOne: false
+            referencedRelation: "customers_vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_deals_stage_id_fkey"
+            columns: ["stage_id"]
+            isOneToOne: false
+            referencedRelation: "crm_stages"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "crm_deals_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crm_stages: {
+        Row: {
+          color: string
+          created_at: string
+          id: string
+          is_lost: boolean
+          is_won: boolean
+          name: string
+          position: number
+          probability: number
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          id?: string
+          is_lost?: boolean
+          is_won?: boolean
+          name: string
+          position?: number
+          probability?: number
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          id?: string
+          is_lost?: boolean
+          is_won?: boolean
+          name?: string
+          position?: number
+          probability?: number
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crm_stages_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       customers_vendors: {
         Row: {
           created_at: string
@@ -635,6 +833,147 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      project_tasks: {
+        Row: {
+          actual_hours: number | null
+          assignee_id: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          estimated_hours: number | null
+          id: string
+          position: number
+          priority: string
+          project_id: string
+          status: string
+          tenant_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          actual_hours?: number | null
+          assignee_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          estimated_hours?: number | null
+          id?: string
+          position?: number
+          priority?: string
+          project_id: string
+          status?: string
+          tenant_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          actual_hours?: number | null
+          assignee_id?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          estimated_hours?: number | null
+          id?: string
+          position?: number
+          priority?: string
+          project_id?: string
+          status?: string
+          tenant_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "project_tasks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "project_tasks_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          actual_cost: number
+          budget: number
+          code: string | null
+          created_at: string
+          created_by: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          name: string
+          owner_id: string | null
+          party_id: string | null
+          priority: string
+          progress: number
+          start_date: string | null
+          status: string
+          tenant_id: string
+          updated_at: string
+        }
+        Insert: {
+          actual_cost?: number
+          budget?: number
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name: string
+          owner_id?: string | null
+          party_id?: string | null
+          priority?: string
+          progress?: number
+          start_date?: string | null
+          status?: string
+          tenant_id: string
+          updated_at?: string
+        }
+        Update: {
+          actual_cost?: number
+          budget?: number
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          name?: string
+          owner_id?: string | null
+          party_id?: string | null
+          priority?: string
+          progress?: number
+          start_date?: string | null
+          status?: string
+          tenant_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_party_id_fkey"
+            columns: ["party_id"]
+            isOneToOne: false
+            referencedRelation: "customers_vendors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "projects_tenant_id_fkey"
+            columns: ["tenant_id"]
+            isOneToOne: false
+            referencedRelation: "tenants"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recurring_rules: {
         Row: {
