@@ -82,7 +82,13 @@ export const patchDeal = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { id, tenant_id, ...patch } = data;
-    const values: Record<string, unknown> = { ...patch };
+    const values: {
+      stage_id?: string | null;
+      status?: string;
+      amount?: number;
+      expected_close_date?: string | null;
+      closed_at?: string | null;
+    } = { ...patch };
     if (patch.status && patch.status !== "open") values.closed_at = new Date().toISOString();
     if (patch.status === "open") values.closed_at = null;
     const { error } = await context.supabase
