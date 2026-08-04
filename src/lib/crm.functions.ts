@@ -14,7 +14,7 @@ export const loadCrm = createServerFn({ method: "POST" })
     const [stages, deals, parties, activities] = await Promise.all([
       s.from("crm_stages").select("*").eq("tenant_id", t).order("position"),
       s.from("crm_deals").select("*").eq("tenant_id", t).order("updated_at", { ascending: false }).limit(2000),
-      s.from("customers_vendors").select("id,name,kind").eq("tenant_id", t).order("name"),
+      s.from("customers_vendors").select("id,name").eq("tenant_id", t).order("name"),
       s.from("crm_activities").select("*").eq("tenant_id", t).order("due_date").limit(1000),
     ]);
     return {

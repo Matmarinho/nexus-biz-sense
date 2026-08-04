@@ -14,7 +14,7 @@ export const loadProjects = createServerFn({ method: "POST" })
     const [projects, tasks, parties] = await Promise.all([
       s.from("projects").select("*").eq("tenant_id", t).order("created_at", { ascending: false }).limit(500),
       s.from("project_tasks").select("*").eq("tenant_id", t).order("position").limit(3000),
-      s.from("customers_vendors").select("id,name,kind").eq("tenant_id", t).order("name"),
+      s.from("customers_vendors").select("id,name").eq("tenant_id", t).order("name"),
     ]);
     return { projects: projects.data ?? [], tasks: tasks.data ?? [], parties: parties.data ?? [] };
   });
