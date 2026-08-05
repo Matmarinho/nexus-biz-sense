@@ -126,7 +126,10 @@ export const updateTenant = createServerFn({ method: "POST" })
       const settings = (current?.settings ?? {}) as Record<string, unknown>;
       update.settings = { ...settings, require_mfa };
     }
-    const { error } = await context.supabase.from("tenants").update(update).eq("id", data.tenantId);
+    const { error } = await context.supabase
+      .from("tenants")
+      .update(update as never)
+      .eq("id", data.tenantId);
     if (error) throw new Error(error.message);
     await writeAudit({
       tenantId: data.tenantId,
