@@ -278,6 +278,7 @@ function SettingsPage() {
         </TabsContent>
 
         <TabsContent value="seguranca" className="mt-4 space-y-4">
+          <TenantMfaCard />
           <PasswordCard />
           <MfaCard />
         </TabsContent>
@@ -306,6 +307,52 @@ function FieldText({
 }
 
 function PasswordCard() {
+  return <PasswordCardInner />;
+}
+
+function TenantMfaCard() {
+  const ws = useWorkspace();
+  const updateT = useServerFn(updateTenant);
+  const canEdit = ws.can("settings", "edit");
+  const current =
+    ((ws.tenant?.settings as Record<string, unknown> | null)?.["require_mfa"] as boolean | undefined) === true;
+  const [saving, setSaving] = useState(false);
+
+  async function toggle(next: boolean) {
+    if (!ws.tenantId) return;
+    setSaving(true);
+    try {
+      await updateT({ data: { tenantId: ws.tenantId, patch: { require_mfa: next } } });
+      await ws.refresh();
+      toast.success(next ? "MFA obrigatório ativado" : "MFA obrigatório desativado");
+    } catch (e) {
+      toast.error("Falha ao salvar", { description: (e as Error).message });
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <ShieldCheck className="size-4" /> Política da empresa
+        </CardTitle>
+        <CardDescription>
+          Exige que todos os membros desta empresa tenham um autenticador cadastrado para acessar o workspace.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <label className="flex items-center justify-between gap-4 rounded-lg border border-border/60 p-3">
+          <span className="text-sm font-medium">Exigir dois fatores para todos</span>
+          <Switch checked={current} disabled={!canEdit || !ws.tenantId || saving} onCheckedChange={toggle} />
+        </label>
+      </CardContent>
+    </Card>
+  );
+}
+
+function PasswordCardInner() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 

@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ThemeProvider } from "@/components/app/theme-provider";
 import { WorkspaceProvider } from "@/components/app/workspace";
 import { AppShell } from "@/components/app/shell";
+import { MfaGate } from "@/components/app/mfa-gate";
 
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
@@ -19,7 +20,9 @@ function AuthenticatedLayout() {
     <ThemeProvider>
       <WorkspaceProvider>
         <AppShell>
-          <Outlet />
+          <MfaGate>
+            <Outlet />
+          </MfaGate>
         </AppShell>
       </WorkspaceProvider>
     </ThemeProvider>
