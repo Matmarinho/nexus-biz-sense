@@ -109,12 +109,27 @@ export const updateTenant = createServerFn({ method: "POST" })
           logo_url: z.string().max(500).nullable().optional(),
           accent_color: z.string().max(9).optional(),
           theme: z.enum(["dark", "light", "system"]).optional(),
+          require_mfa: z.boolean().optional(),
         }),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { error } = await context.supabase.from("tenants").update(data.patch).eq("id", data.tenantId);
+    const { require_mfa, ...patch } = data.patch as typeof data.patch & { require_mfa?: boolean };
+    const update: Record<string, unknown> = { ...patch };
+    if (require_mfa !== undefined) {
+      const { data: current } = await context.supabase
+        .from("tenants")
+        .select("settings")
+        .eq("id", data.tenantId)
+        .maybeSingle();
+      const settings = (current?.settings ?? {}) as Record<string, unknown>;
+      update.settings = { ...settings, require_mfa };
+    }
+    const { error } = await context.supabase
+      .from("tenants")
+      .update(update as never)
+      .eq("id", data.tenantId);
     if (error) throw new Error(error.message);
     await writeAudit({
       tenantId: data.tenantId,
