@@ -27,17 +27,41 @@ import type { Tables } from "@/integrations/supabase/types";
 export const Route = createFileRoute("/_authenticated/crm")({
   head: () => ({
     meta: [
-      { title: "Comercial · CRM · Nexus ERP" },
+      { title: "Gestão Comercial · Nexus ERP" },
       {
         name: "description",
-        content: "Funil de vendas com oportunidades, valores previstos, probabilidade e taxa de conversão por empresa.",
+        content: "Gestão comercial integrada: funil de vendas, compras e almoxarifado por empresa.",
       },
-      { property: "og:title", content: "Comercial · CRM · Nexus ERP" },
-      { property: "og:description", content: "Pipeline comercial multiempresa com previsão de receita." },
+      { property: "og:title", content: "Gestão Comercial · Nexus ERP" },
+      { property: "og:description", content: "Pipeline comercial, compras e estoque multiempresa." },
     ],
   }),
   component: CrmPage,
 });
+
+function CrmPage() {
+  return (
+    <Tabs defaultValue="comercial" className="space-y-6">
+      <div>
+        <p className="text-xs tracking-wide text-muted-foreground uppercase">Gestão Comercial</p>
+        <TabsList className="mt-2">
+          <TabsTrigger value="compras">Compras</TabsTrigger>
+          <TabsTrigger value="comercial">Comercial</TabsTrigger>
+          <TabsTrigger value="almoxarifado">Almoxarifado</TabsTrigger>
+        </TabsList>
+      </div>
+      <TabsContent value="compras">
+        <PurchasesPanel />
+      </TabsContent>
+      <TabsContent value="comercial">
+        <SalesPipeline />
+      </TabsContent>
+      <TabsContent value="almoxarifado">
+        <WarehousePanel />
+      </TabsContent>
+    </Tabs>
+  );
+}
 
 type Deal = Tables<"crm_deals">;
 type Stage = Tables<"crm_stages">;
