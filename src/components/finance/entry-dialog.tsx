@@ -22,7 +22,7 @@ import { useWorkspace } from "@/components/app/workspace";
 import { useFinance } from "@/components/app/use-finance";
 import { BRL } from "@/lib/format";
 import { todayISO } from "@/lib/analytics";
-import { createInstallments } from "@/lib/finance.functions";
+import { createInstallments, saveEntity } from "@/lib/finance.functions";
 
 const NONE = "__none__";
 const parseAmount = (v: string) => Number(v.replace(/\./g, "").replace(",", ".")) || 0;
@@ -35,7 +35,15 @@ const INTERVALS = [
   ["yearly", "Anual"],
 ] as const;
 
-export function EntryDialog() {
+type QuickTable = "financial_categories" | "customers_vendors" | "bank_accounts" | "cost_centers";
+
+export function EntryDialog({
+  defaultDirection = "income",
+  label = "Novo lançamento",
+}: {
+  defaultDirection?: "income" | "expense";
+  label?: string;
+}) {
   const ws = useWorkspace();
   const { data } = useFinance();
   const queryClient = useQueryClient();
@@ -43,7 +51,7 @@ export function EntryDialog() {
   const [open, setOpen] = useState(false);
 
   const empty = {
-    direction: "income" as "income" | "expense",
+    direction: defaultDirection,
     description: "",
     amount: "",
     amount_mode: "per_installment" as "per_installment" | "total",
@@ -104,7 +112,7 @@ export function EntryDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="size-4" /> Novo lançamento
+          <Plus className="size-4" /> {label}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
@@ -172,10 +180,42 @@ export function EntryDialog() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <PickField label="Categoria" value={form.category_id} onChange={(v) => set({ category_id: v })} options={categories.map((c) => [c.id, c.name])} />
-            <PickField label={form.direction === "income" ? "Cliente" : "Fornecedor"} value={form.party_id} onChange={(v) => set({ party_id: v })} options={(data?.parties ?? []).map((p) => [p.id, p.name])} />
-            <PickField label="Conta bancária" value={form.bank_account_id} onChange={(v) => set({ bank_account_id: v })} options={(data?.accounts ?? []).map((a) => [a.id, a.name])} />
-            <PickField label="Centro de custo" value={form.cost_center_id} onChange={(v) => set({ cost_center_id: v })} options={(data?.costCenters ?? []).map((c) => [c.id, c.name])} />
+            <PickField
+              label="Categoria"
+              value={form.category_id}
+              onChange={(v) => set({ category_id: v })}
+              options={categories.map((c) => [c.id, c.name])}
+              quick={{ table: "financial_categories", title: "Nova categoria", extra: { kind: form.direction } }}
+            />
+            <PickField
+              label={form.direction === "income" ? "Cliente" : "Fornecedor"}
+              value={form.party_id}
+              onChange={(v) => set({ party_id: v })}
+              options={(data?.parties ?? []).map((p) => [p.id, p.name])}
+              quick={{
+                table: "customers_vendors",
+                title: form.direction === "income" ? "Novo cliente" : "Novo fornecedor",
+                extra: { type: form.direction === "income" ? "customer" : "vendor", is_active: true },
+              }}
+            />
+            <PickField
+              label="Conta bancária"
+              value={form.bank_account_id}
+              onChange={(v) => set({ bank_account_id: v })}
+              options={(data?.accounts ?? []).map((a) => [a.id, a.name])}
+              quick={{
+                table: "bank_accounts",
+                title: "Nova conta bancária",
+                extra: { account_type: "checking", opening_balance: 0, currency: ws.tenant?.currency ?? "BRL", is_active: true },
+              }}
+            />
+            <PickField
+              label="Centro de custo"
+              value={form.cost_center_id}
+              onChange={(v) => set({ cost_center_id: v })}
+              options={(data?.costCenters ?? []).map((c) => [c.id, c.name])}
+              quick={{ table: "cost_centers", title: "Novo centro de custo", extra: {} }}
+            />
             <PickField
               label="Forma de pagamento"
               value={form.payment_method}
@@ -220,24 +260,75 @@ function PickField({
   value,
   onChange,
   options,
+  quick,
 }: {
   label: string;
   value: string;
   onChange: (v: string) => void;
   options: (readonly [string, string])[] | [string, string][];
+  quick?: { table: QuickTable; title: string; extra: Record<string, unknown> };
 }) {
   return (
     <div className="space-y-2">
       <Label>{label}</Label>
-      <Select value={value} onValueChange={onChange}>
-        <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
-        <SelectContent>
-          <SelectItem value={NONE}>— nenhum —</SelectItem>
-          {options.map(([id, name]) => (
-            <SelectItem key={id} value={id}>{name}</SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="flex gap-2">
+        <Select value={value} onValueChange={onChange}>
+          <SelectTrigger className="flex-1"><SelectValue placeholder="Selecionar" /></SelectTrigger>
+          <SelectContent>
+            <SelectItem value={NONE}>— nenhum —</SelectItem>
+            {options.map(([id, name]) => (
+              <SelectItem key={id} value={id}>{name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {quick && <QuickCreate {...quick} />}
+      </div>
     </div>
+  );
+}
+
+function QuickCreate({ table, title, extra }: { table: QuickTable; title: string; extra: Record<string, unknown> }) {
+  const ws = useWorkspace();
+  const queryClient = useQueryClient();
+  const save = useServerFn(saveEntity);
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState("");
+
+  const mutation = useMutation({
+    mutationFn: () =>
+      save({ data: { table, tenantId: ws.tenantId!, values: { ...extra, name: name.trim() } as never } }),
+    onSuccess: async () => {
+      toast.success(`${title} criado`);
+      setName("");
+      setOpen(false);
+      await queryClient.invalidateQueries({ queryKey: ["finance", ws.tenantId] });
+    },
+    onError: (e: Error) => toast.error("Erro ao criar", { description: e.message }),
+  });
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button type="button" variant="outline" size="icon" title={title}>
+          <Plus className="size-4" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-sm">
+        <DialogHeader>
+          <DialogTitle>{title}</DialogTitle>
+          <DialogDescription>Cadastre sem sair do lançamento.</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-2">
+          <Label htmlFor={`quick-${table}`}>Nome *</Label>
+          <Input id={`quick-${table}`} value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+        </div>
+        <DialogFooter>
+          <Button onClick={() => mutation.mutate()} disabled={mutation.isPending || !name.trim()}>
+            {mutation.isPending && <Loader2 className="size-4 animate-spin" />}
+            Criar
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
