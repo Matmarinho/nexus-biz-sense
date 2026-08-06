@@ -27,7 +27,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "Nexus ERP · Plataforma global de gestão empresarial" },
       {
         property: "og:description",
-        content: "Financeiro, contratos, CRM, BI e inteligência artificial em uma plataforma multiempresa segura.",
+        content: "ERP corporativo multiempresa com IA: financeiro, contratos, CRM, projetos, BI e dashboards em tempo real para empresas privadas e órgãos públicos.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
