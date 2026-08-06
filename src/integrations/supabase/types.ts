@@ -114,45 +114,72 @@ export type Database = {
       bank_accounts: {
         Row: {
           account_type: string
+          bank_code: string | null
           bank_name: string | null
+          card_limit: number
+          card_used: number
           color: string | null
+          connection_status: string
           created_at: string
           created_by: string | null
+          credit_score: number | null
           currency: string
           id: string
+          invested_amount: number
           is_active: boolean
+          last_sync_at: string | null
+          logo_url: string | null
           name: string
           opening_balance: number
           tenant_id: string
           updated_at: string
+          yield_cdi_percent: number
         }
         Insert: {
           account_type?: string
+          bank_code?: string | null
           bank_name?: string | null
+          card_limit?: number
+          card_used?: number
           color?: string | null
+          connection_status?: string
           created_at?: string
           created_by?: string | null
+          credit_score?: number | null
           currency?: string
           id?: string
+          invested_amount?: number
           is_active?: boolean
+          last_sync_at?: string | null
+          logo_url?: string | null
           name: string
           opening_balance?: number
           tenant_id: string
           updated_at?: string
+          yield_cdi_percent?: number
         }
         Update: {
           account_type?: string
+          bank_code?: string | null
           bank_name?: string | null
+          card_limit?: number
+          card_used?: number
           color?: string | null
+          connection_status?: string
           created_at?: string
           created_by?: string | null
+          credit_score?: number | null
           currency?: string
           id?: string
+          invested_amount?: number
           is_active?: boolean
+          last_sync_at?: string | null
+          logo_url?: string | null
           name?: string
           opening_balance?: number
           tenant_id?: string
           updated_at?: string
+          yield_cdi_percent?: number
         }
         Relationships: [
           {
