@@ -3,16 +3,32 @@ import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Download, Layers, Search, Trash2, Undo2 } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarClock,
+  Check,
+  Download,
+  Layers,
+  ReceiptText,
+  Search,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  Undo2,
+  Wallet,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Money } from "@/components/app/money";
 import { useFinance } from "@/components/app/use-finance";
 import { useWorkspace } from "@/components/app/workspace";
 import { EntryDialog } from "@/components/finance/entry-dialog";
+import { BanksPanel } from "@/components/finance/banks-panel";
+import { BillingPanel } from "@/components/finance/billing-panel";
 import { BRL } from "@/lib/format";
 import { todayISO } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -21,20 +37,53 @@ import { deleteTransaction, deleteTransactionSeries, patchTransaction } from "@/
 export const Route = createFileRoute("/_authenticated/financeiro")({
   head: () => ({
     meta: [
-      { title: "Financeiro · Nexus ERP" },
+      { title: "Gestão Financeira · Nexus ERP" },
       {
         name: "description",
-        content: "Planilha de lançamentos editável: contas a pagar e a receber, parcelamentos, categorias e contas bancárias.",
+        content:
+          "Financeiro, faturamento e bancos: lançamentos editáveis, parcelamentos, Open Finance, saldos e score de crédito.",
       },
-      { property: "og:title", content: "Financeiro · Nexus ERP" },
-      { property: "og:description", content: "Gestão completa do fluxo financeiro empresarial em modo planilha." },
+      { property: "og:title", content: "Gestão Financeira · Nexus ERP" },
+      { property: "og:description", content: "Fluxo financeiro, faturamento e bancos em um só lugar." },
     ],
   }),
-  component: FinancePage,
+  component: FinanceHub,
 });
+
+function FinanceHub() {
+  return (
+    <Tabs defaultValue="financeiro" className="space-y-6">
+      <div>
+        <p className="text-xs tracking-wide text-muted-foreground uppercase">Gestão Financeira</p>
+        <TabsList className="mt-2">
+          <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
+          <TabsTrigger value="faturamento">Faturamento</TabsTrigger>
+          <TabsTrigger value="bancos">Bancos</TabsTrigger>
+        </TabsList>
+      </div>
+      <TabsContent value="financeiro">
+        <FinancePage />
+      </TabsContent>
+      <TabsContent value="faturamento">
+        <BillingPanel />
+      </TabsContent>
+      <TabsContent value="bancos">
+        <BanksPanel />
+      </TabsContent>
+    </Tabs>
+  );
+}
 
 type Filter = "all" | "income" | "expense" | "pending" | "paid" | "overdue";
 const NONE = "__none__";
+
+const FOCUS_CARDS: { key: Filter; label: string; hint: string; icon: typeof Wallet; tone: string }[] = [
+  { key: "expense", label: "Despesas", hint: "Tudo que sai do caixa", icon: TrendingDown, tone: "text-negative" },
+  { key: "paid", label: "Pagos", hint: "Lançamentos já liquidados", icon: Check, tone: "text-positive" },
+  { key: "pending", label: "À pagar", hint: "Em aberto no período", icon: CalendarClock, tone: "text-warning" },
+  { key: "overdue", label: "Vencidos", hint: "Passaram do vencimento", icon: ReceiptText, tone: "text-negative" },
+  { key: "income", label: "Receitas", hint: "Tudo que entra no caixa", icon: TrendingUp, tone: "text-positive" },
+];
 
 const FILTERS: [Filter, string][] = [
   ["all", "Todos"],
@@ -49,7 +98,9 @@ function FinancePage() {
   const ws = useWorkspace();
   const { data, isLoading } = useFinance();
   const queryClient = useQueryClient();
-  const [filter, setFilter] = useState<Filter>("all");
+  const [focus, setFocus] = useState<Filter | null>(null);
+  const filter: Filter = focus ?? "all";
+  const setFilter = (f: Filter) => setFocus(f);
   const [search, setSearch] = useState("");
   const [month, setMonth] = useState("");
 
@@ -145,11 +196,46 @@ function FinancePage() {
 
   if (!ws.tenantId) return <p className="text-sm text-muted-foreground">Selecione uma empresa.</p>;
 
+  if (!focus) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-2xl border border-border/60 bg-surface/60 p-6">
+          <h1 className="font-display text-2xl font-semibold">Olá, o que você gostaria de ver hoje?</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Escolha uma visão para abrir a planilha de lançamentos já filtrada.
+          </p>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+            {FOCUS_CARDS.map((card) => (
+              <button
+                key={card.key}
+                type="button"
+                onClick={() => setFocus(card.key)}
+                className="group rounded-xl border border-border/60 bg-surface-2/50 p-4 text-left transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:bg-primary/5"
+              >
+                <card.icon className={cn("size-5", card.tone)} />
+                <p className="mt-3 font-medium">{card.label}</p>
+                <p className="text-xs text-muted-foreground">{card.hint}</p>
+              </button>
+            ))}
+          </div>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => setFocus("all")}>
+              Ver todos os lançamentos
+            </Button>
+            {ws.can("finance", "create") && <EntryDialog />}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs tracking-wide text-muted-foreground uppercase">Financeiro</p>
+          <Button variant="ghost" size="sm" className="mb-1 -ml-2 h-7 px-2 text-xs" onClick={() => setFocus(null)}>
+            <ArrowLeft className="size-3.5" /> Voltar às opções
+          </Button>
           <h1 className="font-display text-2xl font-semibold">Planilha de lançamentos</h1>
           <p className="text-xs text-muted-foreground">Clique em qualquer célula para editar. As alterações salvam ao sair do campo.</p>
         </div>
