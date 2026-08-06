@@ -51,7 +51,7 @@ type Member = {
   profiles: { full_name: string | null; email: string | null; avatar_url: string | null } | null;
 };
 
-export function TeamPage() {
+export function TeamPanel() {
   const ws = useWorkspace();
   const queryClient = useQueryClient();
   const load = useServerFn(listMembers);
