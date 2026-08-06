@@ -55,7 +55,7 @@ const EMPTY = {
   notes: "",
 };
 
-function CrmPage() {
+function SalesPipeline() {
   const ws = useWorkspace();
   const qc = useQueryClient();
   const load = useServerFn(loadCrm);
