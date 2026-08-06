@@ -28,6 +28,7 @@ import { useFinance } from "@/components/app/use-finance";
 import { useWorkspace } from "@/components/app/workspace";
 import { EntryDialog } from "@/components/finance/entry-dialog";
 import { BanksPanel } from "@/components/finance/banks-panel";
+import { BillingPanel } from "@/components/finance/billing-panel";
 import { BRL } from "@/lib/format";
 import { todayISO } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
