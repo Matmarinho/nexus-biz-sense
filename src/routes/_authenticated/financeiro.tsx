@@ -3,16 +3,31 @@ import { useMemo, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
-import { Check, Download, Layers, Search, Trash2, Undo2 } from "lucide-react";
+import {
+  ArrowLeft,
+  CalendarClock,
+  Check,
+  Download,
+  Layers,
+  ReceiptText,
+  Search,
+  Trash2,
+  TrendingDown,
+  TrendingUp,
+  Undo2,
+  Wallet,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Money } from "@/components/app/money";
 import { useFinance } from "@/components/app/use-finance";
 import { useWorkspace } from "@/components/app/workspace";
 import { EntryDialog } from "@/components/finance/entry-dialog";
+import { BanksPanel } from "@/components/finance/banks-panel";
 import { BRL } from "@/lib/format";
 import { todayISO } from "@/lib/analytics";
 import { cn } from "@/lib/utils";
@@ -21,17 +36,42 @@ import { deleteTransaction, deleteTransactionSeries, patchTransaction } from "@/
 export const Route = createFileRoute("/_authenticated/financeiro")({
   head: () => ({
     meta: [
-      { title: "Financeiro · Nexus ERP" },
+      { title: "Gestão Financeira · Nexus ERP" },
       {
         name: "description",
-        content: "Planilha de lançamentos editável: contas a pagar e a receber, parcelamentos, categorias e contas bancárias.",
+        content:
+          "Financeiro, faturamento e bancos: lançamentos editáveis, parcelamentos, Open Finance, saldos e score de crédito.",
       },
-      { property: "og:title", content: "Financeiro · Nexus ERP" },
-      { property: "og:description", content: "Gestão completa do fluxo financeiro empresarial em modo planilha." },
+      { property: "og:title", content: "Gestão Financeira · Nexus ERP" },
+      { property: "og:description", content: "Fluxo financeiro, faturamento e bancos em um só lugar." },
     ],
   }),
-  component: FinancePage,
+  component: FinanceHub,
 });
+
+function FinanceHub() {
+  return (
+    <Tabs defaultValue="financeiro" className="space-y-6">
+      <div>
+        <p className="text-xs tracking-wide text-muted-foreground uppercase">Gestão Financeira</p>
+        <TabsList className="mt-2">
+          <TabsTrigger value="financeiro">Financeiro</TabsTrigger>
+          <TabsTrigger value="faturamento">Faturamento</TabsTrigger>
+          <TabsTrigger value="bancos">Bancos</TabsTrigger>
+        </TabsList>
+      </div>
+      <TabsContent value="financeiro">
+        <FinancePage />
+      </TabsContent>
+      <TabsContent value="faturamento">
+        <BillingPanel />
+      </TabsContent>
+      <TabsContent value="bancos">
+        <BanksPanel />
+      </TabsContent>
+    </Tabs>
+  );
+}
 
 type Filter = "all" | "income" | "expense" | "pending" | "paid" | "overdue";
 const NONE = "__none__";
