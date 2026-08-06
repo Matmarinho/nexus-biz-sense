@@ -1,4 +1,3 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -40,21 +39,6 @@ import {
 import { formatDate } from "@/lib/format";
 import { inviteMember, listMembers, removeMember, revokeInvite, updateMember } from "@/lib/tenants.functions";
 
-export const Route = createFileRoute("/_authenticated/equipe")({
-  head: () => ({
-    meta: [
-      { title: "Equipe e acessos · Nexus ERP" },
-      {
-        name: "description",
-        content: "Convide pessoas, defina papéis e ajuste permissões por módulo em cada empresa.",
-      },
-      { property: "og:title", content: "Equipe e acessos · Nexus ERP" },
-      { property: "og:description", content: "Gestão de usuários e permissões granulares por empresa." },
-    ],
-  }),
-  component: TeamPage,
-});
-
 const ASSIGNABLE: AppRole[] = ["admin", "manager", "finance", "employee", "accountant", "client", "viewer"];
 
 type Member = {
@@ -67,7 +51,7 @@ type Member = {
   profiles: { full_name: string | null; email: string | null; avatar_url: string | null } | null;
 };
 
-function TeamPage() {
+export function TeamPage() {
   const ws = useWorkspace();
   const queryClient = useQueryClient();
   const load = useServerFn(listMembers);
