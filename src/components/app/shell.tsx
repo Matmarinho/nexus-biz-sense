@@ -36,10 +36,10 @@ import { useWorkspace } from "./workspace";
 
 const NAV = [
   { to: "/dashboard", label: "Visão executiva", icon: LayoutDashboard, module: "dashboard" as const },
-  { to: "/financeiro", label: "Financeiro", icon: Wallet, module: "finance" as const },
-  { to: "/crm", label: "Comercial", icon: Target, module: "crm" as const },
+  { to: "/financeiro", label: "Gestão Financeira", icon: Wallet, module: "finance" as const },
+  { to: "/crm", label: "Gestão Comercial", icon: Target, module: "crm" as const },
   { to: "/projetos", label: "Projetos", icon: FolderKanban, module: "projects" as const },
-  { to: "/equipe", label: "Equipe e acessos", icon: Users, module: "users" as const },
+  { to: "/usuarios", label: "Gestão de Usuários", icon: Users, module: "users" as const },
   { to: "/configuracoes", label: "Configurações", icon: Settings, module: "settings" as const },
 ];
 
