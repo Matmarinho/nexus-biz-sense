@@ -1,7 +1,10 @@
+import { useState } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  Boxes,
   Building2,
+  CalendarDays,
   ChevronsUpDown,
   Crown,
   Eye,
@@ -10,10 +13,16 @@ import {
   LogOut,
   Moon,
   FolderKanban,
+  FolderOpen,
+  Package,
+  PanelLeft,
   Plus,
   Settings,
+  ShieldCheck,
   Sun,
+  Tags,
   Target,
+  Truck,
   Users,
   Wallet,
 } from "lucide-react";
@@ -86,6 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const { theme, resolved, setTheme, privacy, togglePrivacy } = useTheme();
   const ws = useWorkspace();
+  const [collapsed, setCollapsed] = useState(false);
 
   const tenants = [
     ...ws.memberships.map((m) => ({ id: m.tenant_id, tenant: m.tenants, role: m.role })),
