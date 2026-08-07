@@ -7,6 +7,7 @@ import {
   Store, Users, Video, Wrench, X, Globe2, BookOpen, Code2, Map,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DemoAccessButton } from "@/components/marketing/demo-access-button";
 import { cn } from "@/lib/utils";
 
 type Item = { icon: React.ElementType; label: string; desc: string };
@@ -198,9 +199,10 @@ export function SiteHeader() {
           <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
             <Link to="/auth">Entrar</Link>
           </Button>
-          <Button asChild size="sm" className="hidden sm:inline-flex">
-            <a href="#contato">Solicitar demonstração</a>
-          </Button>
+          <DemoAccessButton
+            label="Testar grátis"
+            className="hidden px-4 py-2 text-xs sm:inline-flex"
+          />
           <Button
             variant="ghost"
             size="icon"
@@ -229,6 +231,7 @@ export function SiteHeader() {
           <Link to="/auth" className="rounded-lg bg-primary px-3 py-2 text-center text-sm font-medium text-primary-foreground">
             Entrar
           </Link>
+          <DemoAccessButton label="Testar grátis agora" className="justify-center px-3 py-2 text-sm" />
         </div>
       )}
     </header>
