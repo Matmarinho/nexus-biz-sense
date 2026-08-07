@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { ArrowRight, ChevronDown, PlayCircle } from "lucide-react";
 import { SiteHeader } from "@/components/marketing/site-header";
+import { DemoAccessButton } from "@/components/marketing/demo-access-button";
 import { SiteFooter } from "@/components/marketing/site-footer";
 import { VideoBackdrop } from "@/components/marketing/video-backdrop";
 import {
@@ -60,9 +61,10 @@ function Landing() {
               multiempresa — segura, auditável e pronta para operações globais.
             </p>
             <div className="mt-9 flex flex-wrap gap-3">
+              <DemoAccessButton label="Entrar grátis agora e conhecer por dentro" />
               <Link
                 to="/auth"
-                className="inline-flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-medium text-primary-foreground transition-all hover:-translate-y-0.5 hover:bg-primary/90"
+                className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-accent"
               >
                 Entrar <ArrowRight className="size-4" />
               </Link>
@@ -72,13 +74,10 @@ function Landing() {
               >
                 Solicitar demonstração
               </a>
-              <a
-                href="#plataforma"
-                className="inline-flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium transition-colors hover:bg-accent"
-              >
-                <PlayCircle className="size-4" /> Conheça a plataforma
-              </a>
             </div>
+            <p className="mt-3 text-xs text-muted-foreground">
+              Sem cartão, sem cadastro — acesso imediato à empresa demo com dados de exemplo.
+            </p>
           </div>
           <a
             href="#empresa"
