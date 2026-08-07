@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VideoBackdrop } from "@/components/marketing/video-backdrop";
+import { DemoAccessButton } from "@/components/marketing/demo-access-button";
 
 export const Route = createFileRoute("/auth")({
   head: () => ({
@@ -296,6 +297,11 @@ function AuthPage() {
             {googleLoading ? <Loader2 className="size-4 animate-spin" /> : <GoogleIcon />}
             Continuar com Google
           </Button>
+
+          <DemoAccessButton label="Entrar grátis na demonstração" className="mt-3 w-full justify-center" />
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Acesso imediato à empresa demo, sem cadastro.
+          </p>
 
           <p className="mt-6 text-center text-xs text-muted-foreground">
             Ao continuar você concorda com os termos de uso e a política de privacidade.{" "}
