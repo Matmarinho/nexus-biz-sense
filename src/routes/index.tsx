@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { ArrowRight, ChevronDown, PlayCircle } from "lucide-react";
+import { ArrowRight, ChevronDown } from "lucide-react";
 import { SiteHeader } from "@/components/marketing/site-header";
 import { DemoAccessButton } from "@/components/marketing/demo-access-button";
 import { SiteFooter } from "@/components/marketing/site-footer";
