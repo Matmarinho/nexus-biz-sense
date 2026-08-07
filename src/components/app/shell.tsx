@@ -34,13 +34,41 @@ import { ROLE_LABELS } from "@/lib/permissions";
 import { useTheme } from "./theme-provider";
 import { useWorkspace } from "./workspace";
 
-const NAV = [
-  { to: "/dashboard", label: "Visão executiva", icon: LayoutDashboard, module: "dashboard" as const },
-  { to: "/financeiro", label: "Gestão Financeira", icon: Wallet, module: "finance" as const },
-  { to: "/crm", label: "Gestão Comercial", icon: Target, module: "crm" as const },
-  { to: "/projetos", label: "Projetos", icon: FolderKanban, module: "projects" as const },
-  { to: "/usuarios", label: "Gestão de Usuários", icon: Users, module: "users" as const },
-  { to: "/configuracoes", label: "Configurações", icon: Settings, module: "settings" as const },
+const NAV_GROUPS = [
+  {
+    label: "Visão geral",
+    items: [{ to: "/dashboard", label: "Dashboard", icon: LayoutDashboard, module: "dashboard" as const }],
+  },
+  {
+    label: "Cadastros",
+    items: [
+      { to: "/clientes", label: "Clientes", icon: Users, module: "parties" as const },
+      { to: "/fornecedores", label: "Fornecedores", icon: Truck, module: "parties" as const },
+      { to: "/produtos", label: "Produtos", icon: Package, module: "parties" as const },
+      { to: "/categorias", label: "Categorias", icon: Tags, module: "parties" as const },
+    ],
+  },
+  {
+    label: "Operações",
+    items: [
+      { to: "/estoque", label: "Estoque", icon: Boxes, module: "parties" as const },
+      { to: "/crm", label: "Gestão Comercial", icon: Target, module: "crm" as const },
+      { to: "/projetos", label: "Projetos", icon: FolderKanban, module: "projects" as const },
+      { to: "/agenda", label: "Agenda", icon: CalendarDays, module: "dashboard" as const },
+      { to: "/arquivos", label: "Arquivos", icon: FolderOpen, module: "dashboard" as const },
+    ],
+  },
+  {
+    label: "Financeiro",
+    items: [{ to: "/financeiro", label: "Gestão Financeira", icon: Wallet, module: "finance" as const }],
+  },
+  {
+    label: "Administração",
+    items: [
+      { to: "/usuarios", label: "Usuários e permissões", icon: ShieldCheck, module: "users" as const },
+      { to: "/configuracoes", label: "Configurações", icon: Settings, module: "settings" as const },
+    ],
+  },
 ];
 
 function initials(name?: string | null, email?: string | null) {
@@ -75,56 +103,89 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <aside className="hidden w-64 shrink-0 flex-col border-r border-border/60 bg-surface/60 px-3 py-4 lg:flex">
+      <aside
+        className={cn(
+          "hidden shrink-0 flex-col overflow-y-auto border-r border-border/60 bg-surface/60 px-3 py-4 transition-[width] duration-200 lg:flex",
+          collapsed ? "w-[4.5rem]" : "w-64",
+        )}
+      >
         <Link to="/dashboard" className="mb-6 flex items-center gap-2 px-2">
           <div className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground">
             <Building2 className="size-5" />
           </div>
-          <div className="leading-tight">
+          <div className={cn("leading-tight", collapsed && "hidden")}>
             <p className="font-display text-sm font-semibold">Nexus ERP</p>
-            <p className="text-[11px] text-muted-foreground">Gestão inteligente</p>
+            <p className="text-[11px] text-muted-foreground">Gestão empresarial</p>
           </div>
         </Link>
 
-        <nav className="flex flex-1 flex-col gap-1">
-          {NAV.filter((item) => ws.can(item.module, "view")).map((item) => {
-            const active = pathname.startsWith(item.to);
+        <nav className="flex flex-1 flex-col gap-4">
+          {NAV_GROUPS.map((group) => {
+            const items = group.items.filter((item) => ws.can(item.module, "view"));
+            if (!items.length) return null;
             return (
-              <Link
-                key={item.to}
-                to={item.to}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
-                  active && "bg-accent text-foreground shadow-[inset_2px_0_0_0_var(--color-primary)]",
+              <div key={group.label} className="space-y-1">
+                {!collapsed && (
+                  <p className="px-3 text-[11px] font-medium tracking-wide text-muted-foreground uppercase">
+                    {group.label}
+                  </p>
                 )}
-              >
-                <item.icon className="size-4" />
-                {item.label}
-              </Link>
+                {items.map((item) => {
+                  const active = pathname.startsWith(item.to);
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      title={item.label}
+                      className={cn(
+                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground",
+                        collapsed && "justify-center px-2",
+                        active && "bg-accent text-foreground shadow-[inset_2px_0_0_0_var(--color-primary)]",
+                      )}
+                    >
+                      <item.icon className="size-4 shrink-0" />
+                      {!collapsed && item.label}
+                    </Link>
+                  );
+                })}
+              </div>
             );
           })}
           {ws.isSuperadmin && (
             <Link
               to="/console"
+              title="Console supremo"
               className={cn(
                 "mt-2 flex items-center gap-3 rounded-lg border border-primary/30 px-3 py-2 text-sm text-primary transition-colors hover:bg-primary/10",
+                collapsed && "justify-center px-2",
                 pathname.startsWith("/console") && "bg-primary/10",
               )}
             >
-              <Crown className="size-4" />
-              Console supremo
+              <Crown className="size-4 shrink-0" />
+              {!collapsed && "Console supremo"}
             </Link>
           )}
         </nav>
 
-        <div className="rounded-xl border border-border/60 bg-surface-2/60 p-3 text-xs text-muted-foreground">
-          <p className="font-medium text-foreground">Modo privacidade</p>
-          <p className="mt-1">Pressione Shift + P para ocultar valores.</p>
-        </div>
+        {!collapsed && (
+          <div className="mt-4 rounded-xl border border-border/60 bg-surface-2/60 p-3 text-xs text-muted-foreground">
+            <p className="font-medium text-foreground">Modo privacidade</p>
+            <p className="mt-1">Pressione Shift + P para ocultar valores.</p>
+          </div>
+        )}
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="sticky top-0 z-30 flex h-16 items-center gap-2 border-b border-border/60 bg-background/80 px-4 backdrop-blur-xl">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="hidden lg:flex"
+            title="Recolher menu"
+            onClick={() => setCollapsed((v) => !v)}
+          >
+            <PanelLeft className="size-4" />
+          </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="max-w-[16rem] justify-between gap-2">
