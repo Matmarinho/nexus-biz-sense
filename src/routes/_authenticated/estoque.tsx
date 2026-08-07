@@ -41,7 +41,7 @@ function StockPage() {
         <Card className="border-border/60 bg-surface/60">
           <CardContent className="p-4">
             <p className="text-xs text-muted-foreground uppercase">Valor em estoque</p>
-            <p className="font-display text-2xl font-semibold">{BRL.format(stockValue)}</p>
+            <p className="font-display text-2xl font-semibold">{BRL(stockValue)}</p>
           </CardContent>
         </Card>
         <Card className="border-border/60 bg-surface/60">
@@ -71,7 +71,7 @@ function StockPage() {
             render: (r) => KINDS[String(r.kind)] ?? String(r.kind),
           },
           { key: "quantity", label: "Quantidade", type: "number", step: "0.001", align: "right" },
-          { key: "unit_cost", label: "Custo unit.", type: "number", step: "0.01", align: "right", render: (r) => BRL.format(Number(r.unit_cost ?? 0)) },
+          { key: "unit_cost", label: "Custo unit.", type: "number", step: "0.01", align: "right", render: (r) => BRL(Number(r.unit_cost ?? 0)) },
           { key: "reference", label: "Referência", formOnly: true },
           { key: "reason", label: "Motivo", type: "textarea", formOnly: true },
         ]}

@@ -54,7 +54,7 @@ function ProductsPage() {
           type: "number",
           step: "0.01",
           align: "right",
-          render: (r) => BRL.format(Number(r.cost_price ?? 0)),
+          render: (r) => BRL(Number(r.cost_price ?? 0)),
         },
         {
           key: "sale_price",
@@ -62,7 +62,7 @@ function ProductsPage() {
           type: "number",
           step: "0.01",
           align: "right",
-          render: (r) => BRL.format(Number(r.sale_price ?? 0)),
+          render: (r) => BRL(Number(r.sale_price ?? 0)),
         },
         {
           key: "stock_qty",
