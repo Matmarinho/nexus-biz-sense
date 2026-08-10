@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_authenticated/compras")({
   head: () => ({
     meta: [
       { title: "Compras · Nexus ERP" },
-      { name: "description", content: "Pedidos de compra, clientes, status de faturamento e totais." },
+      { name: "description", content: "Pedidos de compra, fornecedores, status de faturamento e totais." },
       { property: "og:title", content: "Compras · Nexus ERP" },
       { property: "og:description", content: "Gestão de pedidos de compra da sua empresa." },
       { property: "og:type", content: "website" },
