@@ -113,13 +113,14 @@ const RECURSOS: Group[] = [
 ];
 
 const MENUS: { id: string; label: string; target: string; groups?: Group[] }[] = [
-  { id: "plataforma", label: "Plataforma", target: "#plataforma", groups: PLATAFORMA },
-  { id: "solucoes", label: "Soluções", target: "#solucoes", groups: SOLUCOES },
-  { id: "recursos", label: "Recursos", target: "#recursos", groups: RECURSOS },
-  { id: "empresa", label: "Empresa", target: "#empresa" },
-  { id: "cases", label: "Cases", target: "#cases" },
-  { id: "planos", label: "Preços", target: "#planos" },
-  { id: "contato", label: "Contato", target: "#contato" },
+  { id: "plataforma", label: "Plataforma", target: "/#plataforma", groups: PLATAFORMA },
+  { id: "solucoes", label: "Soluções", target: "/#solucoes", groups: SOLUCOES },
+  { id: "recursos", label: "Recursos", target: "/#recursos", groups: RECURSOS },
+  { id: "empresa", label: "Empresa", target: "/#empresa" },
+  { id: "cases", label: "Cases", target: "/#cases" },
+  { id: "planos", label: "Preços", target: "/#planos" },
+  { id: "conhecimento", label: "Conhecimento", target: "/conhecimento" },
+  { id: "contato", label: "Contato", target: "/#contato" },
 ];
 
 function MegaPanel({ groups }: { groups: Group[] }) {
@@ -132,7 +133,7 @@ function MegaPanel({ groups }: { groups: Group[] }) {
             {g.items.map((it) => (
               <li key={it.label}>
                 <a
-                  href="#plataforma"
+                  href="/#plataforma"
                   className="flex items-start gap-3 rounded-xl px-3 py-2 transition-all hover:-translate-y-px hover:bg-accent/60"
                 >
                   <span className="mt-0.5 grid size-8 shrink-0 place-items-center rounded-lg bg-primary/12 text-primary">
