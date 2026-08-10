@@ -20,6 +20,7 @@ import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authentic
 import { Route as AuthenticatedProjetosRouteImport } from './routes/_authenticated/projetos'
 import { Route as AuthenticatedProdutosRouteImport } from './routes/_authenticated/produtos'
 import { Route as AuthenticatedOnboardingRouteImport } from './routes/_authenticated/onboarding'
+import { Route as AuthenticatedIntegracoesRouteImport } from './routes/_authenticated/integracoes'
 import { Route as AuthenticatedFornecedoresRouteImport } from './routes/_authenticated/fornecedores'
 import { Route as AuthenticatedFluxoCaixaRouteImport } from './routes/_authenticated/fluxo-caixa'
 import { Route as AuthenticatedFinanceiroRouteImport } from './routes/_authenticated/financeiro'
@@ -33,6 +34,7 @@ import { Route as AuthenticatedConfiguracoesRouteImport } from './routes/_authen
 import { Route as AuthenticatedComprasRouteImport } from './routes/_authenticated/compras'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 import { Route as AuthenticatedCategoriasRouteImport } from './routes/_authenticated/categorias'
+import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedArquivosRouteImport } from './routes/_authenticated/arquivos'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 
@@ -90,6 +92,12 @@ const AuthenticatedOnboardingRoute = AuthenticatedOnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedIntegracoesRoute =
+  AuthenticatedIntegracoesRouteImport.update({
+    id: '/integracoes',
+    path: '/integracoes',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedFornecedoresRoute =
   AuthenticatedFornecedoresRouteImport.update({
     id: '/fornecedores',
@@ -159,6 +167,11 @@ const AuthenticatedCategoriasRoute = AuthenticatedCategoriasRouteImport.update({
   path: '/categorias',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAuditoriaRoute = AuthenticatedAuditoriaRouteImport.update({
+  id: '/auditoria',
+  path: '/auditoria',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedArquivosRoute = AuthenticatedArquivosRouteImport.update({
   id: '/arquivos',
   path: '/arquivos',
@@ -177,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/arquivos': typeof AuthenticatedArquivosRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/categorias': typeof AuthenticatedCategoriasRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/compras': typeof AuthenticatedComprasRoute
@@ -190,6 +204,7 @@ export interface FileRoutesByFullPath {
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/fluxo-caixa': typeof AuthenticatedFluxoCaixaRoute
   '/fornecedores': typeof AuthenticatedFornecedoresRoute
+  '/integracoes': typeof AuthenticatedIntegracoesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/projetos': typeof AuthenticatedProjetosRoute
@@ -204,6 +219,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/arquivos': typeof AuthenticatedArquivosRoute
+  '/auditoria': typeof AuthenticatedAuditoriaRoute
   '/categorias': typeof AuthenticatedCategoriasRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/compras': typeof AuthenticatedComprasRoute
@@ -217,6 +233,7 @@ export interface FileRoutesByTo {
   '/financeiro': typeof AuthenticatedFinanceiroRoute
   '/fluxo-caixa': typeof AuthenticatedFluxoCaixaRoute
   '/fornecedores': typeof AuthenticatedFornecedoresRoute
+  '/integracoes': typeof AuthenticatedIntegracoesRoute
   '/onboarding': typeof AuthenticatedOnboardingRoute
   '/produtos': typeof AuthenticatedProdutosRoute
   '/projetos': typeof AuthenticatedProjetosRoute
@@ -233,6 +250,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/arquivos': typeof AuthenticatedArquivosRoute
+  '/_authenticated/auditoria': typeof AuthenticatedAuditoriaRoute
   '/_authenticated/categorias': typeof AuthenticatedCategoriasRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/compras': typeof AuthenticatedComprasRoute
@@ -246,6 +264,7 @@ export interface FileRoutesById {
   '/_authenticated/financeiro': typeof AuthenticatedFinanceiroRoute
   '/_authenticated/fluxo-caixa': typeof AuthenticatedFluxoCaixaRoute
   '/_authenticated/fornecedores': typeof AuthenticatedFornecedoresRoute
+  '/_authenticated/integracoes': typeof AuthenticatedIntegracoesRoute
   '/_authenticated/onboarding': typeof AuthenticatedOnboardingRoute
   '/_authenticated/produtos': typeof AuthenticatedProdutosRoute
   '/_authenticated/projetos': typeof AuthenticatedProjetosRoute
@@ -262,6 +281,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/agenda'
     | '/arquivos'
+    | '/auditoria'
     | '/categorias'
     | '/clientes'
     | '/compras'
@@ -275,6 +295,7 @@ export interface FileRouteTypes {
     | '/financeiro'
     | '/fluxo-caixa'
     | '/fornecedores'
+    | '/integracoes'
     | '/onboarding'
     | '/produtos'
     | '/projetos'
@@ -289,6 +310,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/agenda'
     | '/arquivos'
+    | '/auditoria'
     | '/categorias'
     | '/clientes'
     | '/compras'
@@ -302,6 +324,7 @@ export interface FileRouteTypes {
     | '/financeiro'
     | '/fluxo-caixa'
     | '/fornecedores'
+    | '/integracoes'
     | '/onboarding'
     | '/produtos'
     | '/projetos'
@@ -317,6 +340,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/agenda'
     | '/_authenticated/arquivos'
+    | '/_authenticated/auditoria'
     | '/_authenticated/categorias'
     | '/_authenticated/clientes'
     | '/_authenticated/compras'
@@ -330,6 +354,7 @@ export interface FileRouteTypes {
     | '/_authenticated/financeiro'
     | '/_authenticated/fluxo-caixa'
     | '/_authenticated/fornecedores'
+    | '/_authenticated/integracoes'
     | '/_authenticated/onboarding'
     | '/_authenticated/produtos'
     | '/_authenticated/projetos'
@@ -425,6 +450,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedOnboardingRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/integracoes': {
+      id: '/_authenticated/integracoes'
+      path: '/integracoes'
+      fullPath: '/integracoes'
+      preLoaderRoute: typeof AuthenticatedIntegracoesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/fornecedores': {
       id: '/_authenticated/fornecedores'
       path: '/fornecedores'
@@ -516,6 +548,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCategoriasRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/auditoria': {
+      id: '/_authenticated/auditoria'
+      path: '/auditoria'
+      fullPath: '/auditoria'
+      preLoaderRoute: typeof AuthenticatedAuditoriaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/arquivos': {
       id: '/_authenticated/arquivos'
       path: '/arquivos'
@@ -536,6 +575,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
   AuthenticatedArquivosRoute: typeof AuthenticatedArquivosRoute
+  AuthenticatedAuditoriaRoute: typeof AuthenticatedAuditoriaRoute
   AuthenticatedCategoriasRoute: typeof AuthenticatedCategoriasRoute
   AuthenticatedClientesRoute: typeof AuthenticatedClientesRoute
   AuthenticatedComprasRoute: typeof AuthenticatedComprasRoute
@@ -549,6 +589,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedFinanceiroRoute: typeof AuthenticatedFinanceiroRoute
   AuthenticatedFluxoCaixaRoute: typeof AuthenticatedFluxoCaixaRoute
   AuthenticatedFornecedoresRoute: typeof AuthenticatedFornecedoresRoute
+  AuthenticatedIntegracoesRoute: typeof AuthenticatedIntegracoesRoute
   AuthenticatedOnboardingRoute: typeof AuthenticatedOnboardingRoute
   AuthenticatedProdutosRoute: typeof AuthenticatedProdutosRoute
   AuthenticatedProjetosRoute: typeof AuthenticatedProjetosRoute
@@ -560,6 +601,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
   AuthenticatedArquivosRoute: AuthenticatedArquivosRoute,
+  AuthenticatedAuditoriaRoute: AuthenticatedAuditoriaRoute,
   AuthenticatedCategoriasRoute: AuthenticatedCategoriasRoute,
   AuthenticatedClientesRoute: AuthenticatedClientesRoute,
   AuthenticatedComprasRoute: AuthenticatedComprasRoute,
@@ -573,6 +615,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedFinanceiroRoute: AuthenticatedFinanceiroRoute,
   AuthenticatedFluxoCaixaRoute: AuthenticatedFluxoCaixaRoute,
   AuthenticatedFornecedoresRoute: AuthenticatedFornecedoresRoute,
+  AuthenticatedIntegracoesRoute: AuthenticatedIntegracoesRoute,
   AuthenticatedOnboardingRoute: AuthenticatedOnboardingRoute,
   AuthenticatedProdutosRoute: AuthenticatedProdutosRoute,
   AuthenticatedProjetosRoute: AuthenticatedProjetosRoute,
