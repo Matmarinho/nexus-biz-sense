@@ -2,8 +2,16 @@ import { useState } from "react";
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import {
+  BarChart3,
   Boxes,
   Building2,
+  Cable,
+  FileBarChart,
+  ScrollText,
+  ShoppingCart,
+  ReceiptText,
+  ArrowLeftRight,
+  Coins,
   CalendarDays,
   ChevronsUpDown,
   Crown,
@@ -63,18 +71,28 @@ const NAV_GROUPS = [
       { to: "/estoque", label: "Estoque", icon: Boxes, module: "parties" as const },
       { to: "/crm", label: "Gestão Comercial", icon: Target, module: "crm" as const },
       { to: "/projetos", label: "Projetos", icon: FolderKanban, module: "projects" as const },
+      { to: "/vendas", label: "Vendas", icon: ShoppingCart, module: "crm" as const },
+      { to: "/compras", label: "Compras", icon: ReceiptText, module: "parties" as const },
       { to: "/agenda", label: "Agenda", icon: CalendarDays, module: "dashboard" as const },
       { to: "/arquivos", label: "Arquivos", icon: FolderOpen, module: "dashboard" as const },
     ],
   },
   {
     label: "Financeiro",
-    items: [{ to: "/financeiro", label: "Gestão Financeira", icon: Wallet, module: "finance" as const }],
+    items: [
+      { to: "/financeiro", label: "Gestão Financeira", icon: Wallet, module: "finance" as const },
+      { to: "/contas-pagar", label: "Contas a pagar", icon: Coins, module: "finance" as const },
+      { to: "/contas-receber", label: "Contas a receber", icon: ArrowLeftRight, module: "finance" as const },
+      { to: "/fluxo-caixa", label: "Fluxo de caixa", icon: BarChart3, module: "finance" as const },
+      { to: "/relatorios", label: "Relatórios", icon: FileBarChart, module: "reports" as const },
+    ],
   },
   {
     label: "Administração",
     items: [
       { to: "/usuarios", label: "Usuários e permissões", icon: ShieldCheck, module: "users" as const },
+      { to: "/auditoria", label: "Auditoria e logs", icon: ScrollText, module: "settings" as const },
+      { to: "/integracoes", label: "Integrações API", icon: Cable, module: "settings" as const },
       { to: "/configuracoes", label: "Configurações", icon: Settings, module: "settings" as const },
     ],
   },
