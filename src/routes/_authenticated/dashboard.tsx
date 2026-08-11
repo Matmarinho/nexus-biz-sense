@@ -255,7 +255,9 @@ function DashboardPage() {
         <Card className="border-border/60 bg-surface/60">
           <CardHeader>
             <CardTitle className="text-base">Situação da carteira</CardTitle>
-            <CardDescription>Títulos em aberto neste momento.</CardDescription>
+            <CardDescription>
+              Títulos em aberto neste momento — não impactam entradas e saídas do mês enquanto não houver baixa.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <WalletRow label="A receber" value={kpis.receivable} tone="positive" overdue={kpis.overdueIn} />
