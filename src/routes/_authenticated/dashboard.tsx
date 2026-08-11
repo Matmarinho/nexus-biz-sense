@@ -34,6 +34,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { KpiCard } from "@/components/app/kpi-card";
 import { Money } from "@/components/app/money";
+import { AccountsOverview } from "@/components/app/accounts-overview";
 import { useFinance } from "@/components/app/use-finance";
 import { useWorkspace } from "@/components/app/workspace";
 import { BRL, compact, monthLabel, signedPercent } from "@/lib/format";
@@ -198,7 +199,7 @@ function DashboardPage() {
           delta={kpis.incomeDelta}
           tone="positive"
           icon={ArrowUpCircle}
-          hint="vs. mês anterior"
+          hint="liquidada · vs. mês anterior"
         />
         <KpiCard
           label="Despesa do mês"
@@ -206,7 +207,7 @@ function DashboardPage() {
           delta={kpis.expenseDelta != null ? -kpis.expenseDelta : null}
           tone="negative"
           icon={ArrowDownCircle}
-          hint="vs. mês anterior"
+          hint="liquidada · vs. mês anterior"
         />
         <KpiCard
           label="Resultado do mês"
@@ -226,6 +227,8 @@ function DashboardPage() {
           }
         />
       </div>
+
+      <AccountsOverview />
 
       <div className="grid gap-4 xl:grid-cols-3">
         <Card className="border-border/60 bg-surface/60 xl:col-span-2">
@@ -252,7 +255,9 @@ function DashboardPage() {
         <Card className="border-border/60 bg-surface/60">
           <CardHeader>
             <CardTitle className="text-base">Situação da carteira</CardTitle>
-            <CardDescription>Títulos em aberto neste momento.</CardDescription>
+            <CardDescription>
+              Títulos em aberto neste momento — não impactam entradas e saídas do mês enquanto não houver baixa.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <WalletRow label="A receber" value={kpis.receivable} tone="positive" overdue={kpis.overdueIn} />
