@@ -37,6 +37,11 @@ import { Route as AuthenticatedCategoriasRouteImport } from './routes/_authentic
 import { Route as AuthenticatedAuditoriaRouteImport } from './routes/_authenticated/auditoria'
 import { Route as AuthenticatedArquivosRouteImport } from './routes/_authenticated/arquivos'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
+import { Route as ApiPublicV1TransactionsRouteImport } from './routes/api/public/v1/transactions'
+import { Route as ApiPublicV1ProductsRouteImport } from './routes/api/public/v1/products'
+import { Route as ApiPublicV1OrdersRouteImport } from './routes/api/public/v1/orders'
+import { Route as ApiPublicV1WebhooksDispatchRouteImport } from './routes/api/public/v1/webhooks/dispatch'
+import { Route as ApiPublicV1CdiSyncRouteImport } from './routes/api/public/v1/cdi/sync'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -182,6 +187,32 @@ const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
   path: '/agenda',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicV1TransactionsRoute = ApiPublicV1TransactionsRouteImport.update({
+  id: '/api/public/v1/transactions',
+  path: '/api/public/v1/transactions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1ProductsRoute = ApiPublicV1ProductsRouteImport.update({
+  id: '/api/public/v1/products',
+  path: '/api/public/v1/products',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1OrdersRoute = ApiPublicV1OrdersRouteImport.update({
+  id: '/api/public/v1/orders',
+  path: '/api/public/v1/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicV1WebhooksDispatchRoute =
+  ApiPublicV1WebhooksDispatchRouteImport.update({
+    id: '/api/public/v1/webhooks/dispatch',
+    path: '/api/public/v1/webhooks/dispatch',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicV1CdiSyncRoute = ApiPublicV1CdiSyncRouteImport.update({
+  id: '/api/public/v1/cdi/sync',
+  path: '/api/public/v1/cdi/sync',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -211,6 +242,11 @@ export interface FileRoutesByFullPath {
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/vendas': typeof AuthenticatedVendasRoute
+  '/api/public/v1/orders': typeof ApiPublicV1OrdersRoute
+  '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
+  '/api/public/v1/transactions': typeof ApiPublicV1TransactionsRoute
+  '/api/public/v1/cdi/sync': typeof ApiPublicV1CdiSyncRoute
+  '/api/public/v1/webhooks/dispatch': typeof ApiPublicV1WebhooksDispatchRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -240,6 +276,11 @@ export interface FileRoutesByTo {
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/vendas': typeof AuthenticatedVendasRoute
+  '/api/public/v1/orders': typeof ApiPublicV1OrdersRoute
+  '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
+  '/api/public/v1/transactions': typeof ApiPublicV1TransactionsRoute
+  '/api/public/v1/cdi/sync': typeof ApiPublicV1CdiSyncRoute
+  '/api/public/v1/webhooks/dispatch': typeof ApiPublicV1WebhooksDispatchRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -271,6 +312,11 @@ export interface FileRoutesById {
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/_authenticated/vendas': typeof AuthenticatedVendasRoute
+  '/api/public/v1/orders': typeof ApiPublicV1OrdersRoute
+  '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
+  '/api/public/v1/transactions': typeof ApiPublicV1TransactionsRoute
+  '/api/public/v1/cdi/sync': typeof ApiPublicV1CdiSyncRoute
+  '/api/public/v1/webhooks/dispatch': typeof ApiPublicV1WebhooksDispatchRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -302,6 +348,11 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
+    | '/api/public/v1/orders'
+    | '/api/public/v1/products'
+    | '/api/public/v1/transactions'
+    | '/api/public/v1/cdi/sync'
+    | '/api/public/v1/webhooks/dispatch'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -331,6 +382,11 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
+    | '/api/public/v1/orders'
+    | '/api/public/v1/products'
+    | '/api/public/v1/transactions'
+    | '/api/public/v1/cdi/sync'
+    | '/api/public/v1/webhooks/dispatch'
   id:
     | '__root__'
     | '/'
@@ -361,6 +417,11 @@ export interface FileRouteTypes {
     | '/_authenticated/relatorios'
     | '/_authenticated/usuarios'
     | '/_authenticated/vendas'
+    | '/api/public/v1/orders'
+    | '/api/public/v1/products'
+    | '/api/public/v1/transactions'
+    | '/api/public/v1/cdi/sync'
+    | '/api/public/v1/webhooks/dispatch'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -369,6 +430,11 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ConhecimentoRoute: typeof ConhecimentoRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicV1OrdersRoute: typeof ApiPublicV1OrdersRoute
+  ApiPublicV1ProductsRoute: typeof ApiPublicV1ProductsRoute
+  ApiPublicV1TransactionsRoute: typeof ApiPublicV1TransactionsRoute
+  ApiPublicV1CdiSyncRoute: typeof ApiPublicV1CdiSyncRoute
+  ApiPublicV1WebhooksDispatchRoute: typeof ApiPublicV1WebhooksDispatchRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -569,6 +635,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAgendaRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/v1/transactions': {
+      id: '/api/public/v1/transactions'
+      path: '/api/public/v1/transactions'
+      fullPath: '/api/public/v1/transactions'
+      preLoaderRoute: typeof ApiPublicV1TransactionsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/products': {
+      id: '/api/public/v1/products'
+      path: '/api/public/v1/products'
+      fullPath: '/api/public/v1/products'
+      preLoaderRoute: typeof ApiPublicV1ProductsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/orders': {
+      id: '/api/public/v1/orders'
+      path: '/api/public/v1/orders'
+      fullPath: '/api/public/v1/orders'
+      preLoaderRoute: typeof ApiPublicV1OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/webhooks/dispatch': {
+      id: '/api/public/v1/webhooks/dispatch'
+      path: '/api/public/v1/webhooks/dispatch'
+      fullPath: '/api/public/v1/webhooks/dispatch'
+      preLoaderRoute: typeof ApiPublicV1WebhooksDispatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/v1/cdi/sync': {
+      id: '/api/public/v1/cdi/sync'
+      path: '/api/public/v1/cdi/sync'
+      fullPath: '/api/public/v1/cdi/sync'
+      preLoaderRoute: typeof ApiPublicV1CdiSyncRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -633,6 +734,11 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ConhecimentoRoute: ConhecimentoRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicV1OrdersRoute: ApiPublicV1OrdersRoute,
+  ApiPublicV1ProductsRoute: ApiPublicV1ProductsRoute,
+  ApiPublicV1TransactionsRoute: ApiPublicV1TransactionsRoute,
+  ApiPublicV1CdiSyncRoute: ApiPublicV1CdiSyncRoute,
+  ApiPublicV1WebhooksDispatchRoute: ApiPublicV1WebhooksDispatchRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
