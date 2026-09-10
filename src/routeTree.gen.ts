@@ -14,6 +14,7 @@ import { Route as ConhecimentoRouteImport } from './routes/conhecimento'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ConhecimentoSlugRouteImport } from './routes/conhecimento.$slug'
 import { Route as AuthenticatedVendasRouteImport } from './routes/_authenticated/vendas'
 import { Route as AuthenticatedUsuariosRouteImport } from './routes/_authenticated/usuarios'
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
@@ -66,6 +67,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const ConhecimentoSlugRoute = ConhecimentoSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => ConhecimentoRoute,
 } as any)
 const AuthenticatedVendasRoute = AuthenticatedVendasRouteImport.update({
   id: '/vendas',
@@ -217,7 +223,7 @@ const ApiPublicV1CdiSyncRoute = ApiPublicV1CdiSyncRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/conhecimento': typeof ConhecimentoRoute
+  '/conhecimento': typeof ConhecimentoRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/arquivos': typeof AuthenticatedArquivosRoute
@@ -242,6 +248,7 @@ export interface FileRoutesByFullPath {
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/vendas': typeof AuthenticatedVendasRoute
+  '/conhecimento/$slug': typeof ConhecimentoSlugRoute
   '/api/public/v1/orders': typeof ApiPublicV1OrdersRoute
   '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
   '/api/public/v1/transactions': typeof ApiPublicV1TransactionsRoute
@@ -251,7 +258,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/conhecimento': typeof ConhecimentoRoute
+  '/conhecimento': typeof ConhecimentoRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/agenda': typeof AuthenticatedAgendaRoute
   '/arquivos': typeof AuthenticatedArquivosRoute
@@ -276,6 +283,7 @@ export interface FileRoutesByTo {
   '/relatorios': typeof AuthenticatedRelatoriosRoute
   '/usuarios': typeof AuthenticatedUsuariosRoute
   '/vendas': typeof AuthenticatedVendasRoute
+  '/conhecimento/$slug': typeof ConhecimentoSlugRoute
   '/api/public/v1/orders': typeof ApiPublicV1OrdersRoute
   '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
   '/api/public/v1/transactions': typeof ApiPublicV1TransactionsRoute
@@ -287,7 +295,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/conhecimento': typeof ConhecimentoRoute
+  '/conhecimento': typeof ConhecimentoRouteWithChildren
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
   '/_authenticated/arquivos': typeof AuthenticatedArquivosRoute
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
   '/_authenticated/usuarios': typeof AuthenticatedUsuariosRoute
   '/_authenticated/vendas': typeof AuthenticatedVendasRoute
+  '/conhecimento/$slug': typeof ConhecimentoSlugRoute
   '/api/public/v1/orders': typeof ApiPublicV1OrdersRoute
   '/api/public/v1/products': typeof ApiPublicV1ProductsRoute
   '/api/public/v1/transactions': typeof ApiPublicV1TransactionsRoute
@@ -348,6 +357,7 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
+    | '/conhecimento/$slug'
     | '/api/public/v1/orders'
     | '/api/public/v1/products'
     | '/api/public/v1/transactions'
@@ -382,6 +392,7 @@ export interface FileRouteTypes {
     | '/relatorios'
     | '/usuarios'
     | '/vendas'
+    | '/conhecimento/$slug'
     | '/api/public/v1/orders'
     | '/api/public/v1/products'
     | '/api/public/v1/transactions'
@@ -417,6 +428,7 @@ export interface FileRouteTypes {
     | '/_authenticated/relatorios'
     | '/_authenticated/usuarios'
     | '/_authenticated/vendas'
+    | '/conhecimento/$slug'
     | '/api/public/v1/orders'
     | '/api/public/v1/products'
     | '/api/public/v1/transactions'
@@ -428,7 +440,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  ConhecimentoRoute: typeof ConhecimentoRoute
+  ConhecimentoRoute: typeof ConhecimentoRouteWithChildren
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicV1OrdersRoute: typeof ApiPublicV1OrdersRoute
   ApiPublicV1ProductsRoute: typeof ApiPublicV1ProductsRoute
@@ -473,6 +485,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/conhecimento/$slug': {
+      id: '/conhecimento/$slug'
+      path: '/$slug'
+      fullPath: '/conhecimento/$slug'
+      preLoaderRoute: typeof ConhecimentoSlugRouteImport
+      parentRoute: typeof ConhecimentoRoute
     }
     '/_authenticated/vendas': {
       id: '/_authenticated/vendas'
@@ -728,11 +747,23 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface ConhecimentoRouteChildren {
+  ConhecimentoSlugRoute: typeof ConhecimentoSlugRoute
+}
+
+const ConhecimentoRouteChildren: ConhecimentoRouteChildren = {
+  ConhecimentoSlugRoute: ConhecimentoSlugRoute,
+}
+
+const ConhecimentoRouteWithChildren = ConhecimentoRoute._addFileChildren(
+  ConhecimentoRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  ConhecimentoRoute: ConhecimentoRoute,
+  ConhecimentoRoute: ConhecimentoRouteWithChildren,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicV1OrdersRoute: ApiPublicV1OrdersRoute,
   ApiPublicV1ProductsRoute: ApiPublicV1ProductsRoute,
