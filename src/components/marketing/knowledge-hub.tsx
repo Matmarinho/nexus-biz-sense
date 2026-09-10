@@ -1,51 +1,15 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { Link } from "@tanstack/react-router";
 import {
-  ArrowRight, BarChart3, BookOpen, Boxes, Brain, Building2, Clock, Code2, Compass,
-  FileSignature, GraduationCap, LifeBuoy, PlayCircle, Search, Shield, Sparkles, Target,
-  TrendingUp, Users, Wallet, Workflow,
+  ArrowRight, BookOpen, Brain, Clock, GraduationCap, LifeBuoy, PlayCircle, Search,
+  Target, Wallet,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Reveal } from "./reveal";
 import { cn } from "@/lib/utils";
 
-type Article = {
-  title: string;
-  desc: string;
-  cat: string;
-  minutes: number;
-  level: "Essencial" | "Intermediário" | "Avançado";
-  icon: React.ElementType;
-};
-
-export const KNOWLEDGE_CATEGORIES = [
-  { id: "todos", label: "Todos", icon: Compass },
-  { id: "primeiros-passos", label: "Primeiros passos", icon: Sparkles },
-  { id: "financeiro", label: "Gestão Financeira", icon: Wallet },
-  { id: "comercial", label: "Comercial e CRM", icon: Target },
-  { id: "estoque", label: "Estoque e Compras", icon: Boxes },
-  { id: "bi", label: "BI e Indicadores", icon: BarChart3 },
-  { id: "seguranca", label: "Segurança e acessos", icon: Shield },
-  { id: "api", label: "API e integrações", icon: Code2 },
-];
-
-const ARTICLES: Article[] = [
-  { title: "Como criar sua empresa e convidar o time", desc: "Do primeiro login ao workspace configurado com papéis e permissões por módulo.", cat: "primeiros-passos", minutes: 4, level: "Essencial", icon: Building2 },
-  { title: "Tour guiado pelo Dashboard Executivo", desc: "Entenda o Índice de Saúde do Negócio, tendências e alertas inteligentes.", cat: "primeiros-passos", minutes: 6, level: "Essencial", icon: TrendingUp },
-  { title: "Lançamentos financeiros no modo planilha", desc: "Edição inline, colagem em massa, filtros por situação e atalhos de teclado.", cat: "financeiro", minutes: 7, level: "Intermediário", icon: Wallet },
-  { title: "Parcelamentos e recorrências", desc: "Repita lançamentos por mês, semana ou ano e gerencie a série inteira.", cat: "financeiro", minutes: 5, level: "Intermediário", icon: Clock },
-  { title: "Open Finance: conectar bancos e ler o score", desc: "Saldo, limite de cartão, rendimentos e percentual do CDI em um só painel.", cat: "financeiro", minutes: 8, level: "Avançado", icon: Sparkles },
-  { title: "Pipeline de vendas que fecha negócio", desc: "Kanban de oportunidades, previsão ponderada e atividades por responsável.", cat: "comercial", minutes: 6, level: "Intermediário", icon: Target },
-  { title: "Cadastros que sustentam a operação", desc: "Clientes, fornecedores, produtos e categorias sem duplicidade.", cat: "comercial", minutes: 4, level: "Essencial", icon: Users },
-  { title: "Controle de estoque com movimentações", desc: "Entradas, saídas e ajustes atualizando saldo automaticamente.", cat: "estoque", minutes: 5, level: "Intermediário", icon: Boxes },
-  { title: "Ciclo de compras: da requisição ao recebimento", desc: "Pedidos, itens, custos e impacto direto no fluxo de caixa.", cat: "estoque", minutes: 6, level: "Intermediário", icon: Workflow },
-  { title: "Construindo indicadores executivos", desc: "Como o BI calcula liquidez, inadimplência e projeções de caixa.", cat: "bi", minutes: 9, level: "Avançado", icon: BarChart3 },
-  { title: "Copiloto de IA aplicado à gestão", desc: "Perguntas em linguagem natural sobre seus próprios números.", cat: "bi", minutes: 5, level: "Avançado", icon: Brain },
-  { title: "MFA obrigatório e política de senhas", desc: "Ative segundo fator por empresa e bloqueie senhas vazadas.", cat: "seguranca", minutes: 4, level: "Essencial", icon: Shield },
-  { title: "Trilha de auditoria e logs do sistema", desc: "Quem fez o quê, quando e de onde — com exportação CSV/PDF.", cat: "seguranca", minutes: 5, level: "Avançado", icon: FileSignature },
-  { title: "Autenticação e primeiros endpoints da API", desc: "Chaves, escopos e chamadas REST autenticadas por empresa.", cat: "api", minutes: 7, level: "Avançado", icon: Code2 },
-  { title: "Webhooks e automações sem código", desc: "Dispare fluxos quando um lançamento vence ou um negócio é ganho.", cat: "api", minutes: 6, level: "Intermediário", icon: Workflow },
-];
+import { ARTICLES, KNOWLEDGE_CATEGORIES } from "@/lib/knowledge";
 
 const TRACKS = [
   { title: "Trilha Fundamentos", desc: "Configure a empresa, cadastros e o dashboard.", lessons: 12, progress: 100, icon: GraduationCap },
@@ -207,7 +171,7 @@ export function KnowledgeHub() {
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
               {results.map((a, i) => (
                 <Reveal key={a.title} delay={Math.min(i, 6) * 60}>
-                  <article className="glass group relative h-full overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
+                  <Link to="/conhecimento/$slug" params={{ slug: a.slug }} className="glass group relative block h-full overflow-hidden rounded-3xl p-6 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl">
                     <div
                       aria-hidden
                       className="pointer-events-none absolute -top-24 -right-20 size-48 rounded-full bg-primary/20 opacity-0 blur-3xl transition-opacity duration-500 group-hover:opacity-100"
@@ -230,7 +194,7 @@ export function KnowledgeHub() {
                         Ler agora <ArrowRight className="size-3.5" />
                       </span>
                     </div>
-                  </article>
+                  </Link>
                 </Reveal>
               ))}
             </div>
