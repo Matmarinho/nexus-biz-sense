@@ -49,6 +49,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ROLE_LABELS } from "@/lib/permissions";
 import { useTheme } from "./theme-provider";
+import { AccentTheme } from "./accent-theme";
 import { useWorkspace } from "./workspace";
 
 const NAV_GROUPS = [
@@ -131,6 +132,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen bg-background">
+      <AccentTheme />
       <aside
         className={cn(
           "hidden shrink-0 flex-col overflow-y-auto border-r border-border/60 bg-surface/60 px-3 py-4 transition-[width] duration-200 lg:flex",
