@@ -14,6 +14,8 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useTheme } from "@/components/app/theme-provider";
+import { ACCENT_PRESETS } from "@/components/app/accent-theme";
+import { cn } from "@/lib/utils";
 import { useWorkspace } from "@/components/app/workspace";
 import { savePreferences, saveProfile } from "@/lib/session.functions";
 import { updateTenant } from "@/lib/tenants.functions";
@@ -170,9 +172,33 @@ function SettingsPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="accent">Cor de destaque</Label>
-                <div className="flex items-center gap-2">
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="accent">Cor de destaque do sistema</Label>
+                <p className="text-xs text-muted-foreground">
+                  Muda o realce de menus, botões e gráficos para todo mundo desta empresa.
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {ACCENT_PRESETS.map((p) => (
+                    <button
+                      key={p.id}
+                      type="button"
+                      disabled={!canEditCompany}
+                      onClick={() => setCompany((c) => ({ ...c, accent_color: p.color }))}
+                      aria-pressed={company.accent_color.toLowerCase() === p.color.toLowerCase()}
+                      title={p.label}
+                      className={cn(
+                        "flex items-center gap-2 rounded-xl border px-3 py-2 text-xs transition-all hover:-translate-y-0.5 disabled:opacity-50",
+                        company.accent_color.toLowerCase() === p.color.toLowerCase()
+                          ? "border-primary/60 bg-primary/10"
+                          : "border-border/60",
+                      )}
+                    >
+                      <span className="size-4 rounded-full" style={{ background: p.color }} />
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex items-center gap-2 pt-1">
                   <Input
                     id="accent"
                     type="color"
@@ -181,7 +207,9 @@ function SettingsPage() {
                     onChange={(e) => setCompany((c) => ({ ...c, accent_color: e.target.value }))}
                     disabled={!canEditCompany}
                   />
-                  <span className="numeric text-sm text-muted-foreground">{company.accent_color}</span>
+                  <span className="numeric text-sm text-muted-foreground">
+                    {company.accent_color} · cor personalizada
+                  </span>
                 </div>
               </div>
               <div className="sm:col-span-2">
