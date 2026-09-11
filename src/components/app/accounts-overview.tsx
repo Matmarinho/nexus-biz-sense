@@ -1,4 +1,6 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
 import {
   Area,
   AreaChart,
@@ -17,9 +19,13 @@ import {
   ArrowUpCircle,
   Banknote,
   Clock,
+  Download,
+  FileText,
   PiggyBank,
+  RefreshCw,
   Wallet,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -28,7 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Money } from "@/components/app/money";
 import { useFinance } from "@/components/app/use-finance";
-import { BRL, compact, monthLabel } from "@/lib/format";
+import { BRL, compact, formatDate, monthLabel } from "@/lib/format";
 import { forecast, lastMonths, monthlySeries, type Txn } from "@/lib/analytics";
 import {
   accountSnapshots,
@@ -40,6 +46,8 @@ import {
   type Account,
   type Transfer,
 } from "@/lib/accounts-analytics";
+import { loadCdi } from "@/lib/cdi.functions";
+import { downloadCsv, downloadPdf, type ExportColumn } from "@/lib/export";
 
 const ALL = "__all__";
 
@@ -50,6 +58,18 @@ export function AccountsOverview() {
   const [month, setMonth] = useState<string>(months[months.length - 1]!);
   const [window, setWindow] = useState<"6" | "12" | "24">("12");
   const [cdiAnnual, setCdiAnnual] = useState<number>(DEFAULT_CDI_ANNUAL);
+  const [cdiTouched, setCdiTouched] = useState(false);
+
+  const fetchCdi = useServerFn(loadCdi);
+  const cdiQuery = useQuery({
+    queryKey: ["cdi"],
+    queryFn: () => fetchCdi({ data: undefined }),
+    staleTime: 6 * 60 * 60 * 1000,
+  });
+
+  useEffect(() => {
+    if (!cdiTouched && cdiQuery.data?.rate) setCdiAnnual(Number(cdiQuery.data.rate));
+  }, [cdiQuery.data, cdiTouched]);
 
   const model = useMemo(() => {
     if (!data) return null;
@@ -89,6 +109,47 @@ export function AccountsOverview() {
   const curve = cdiCurve(totals.invested, investCdi, cdiAnnual, 12);
   const p12 = cdiProjection(totals.invested, investCdi, cdiAnnual, 12);
   const p1 = cdiProjection(totals.invested, investCdi, cdiAnnual, 1);
+
+  const scopeLabel = scope === ALL ? "Consolidado geral" : (scoped[0]?.name ?? "conta");
+  const exportColumns: ExportColumn<(typeof scoped)[number]>[] = [
+    { header: "Conta", value: (s) => s.name },
+    { header: "Banco", value: (s) => s.bank_name ?? "" },
+    { header: "Entradas", value: (s) => s.monthIn.toFixed(2) },
+    { header: "Saidas", value: (s) => s.monthOut.toFixed(2) },
+    { header: "Resultado", value: (s) => (s.monthIn - s.monthOut).toFixed(2) },
+    { header: "A receber", value: (s) => s.receivable.toFixed(2) },
+    { header: "A pagar", value: (s) => s.payable.toFixed(2) },
+    { header: "Investido", value: (s) => s.invested.toFixed(2) },
+    { header: "% CDI", value: (s) => s.cdiPercent.toFixed(0) },
+    { header: "Saldo", value: (s) => s.balance.toFixed(2) },
+  ];
+  const exportRows = [
+    ...scoped,
+    {
+      ...scoped[0],
+      id: "total",
+      name: "TOTAL",
+      bank_name: null,
+      monthIn: totals.monthIn,
+      monthOut: totals.monthOut,
+      receivable: totals.receivable,
+      payable: totals.payable,
+      invested: totals.invested,
+      cdiPercent: totals.cdiWeighted,
+      balance: totals.balance,
+    } as (typeof scoped)[number],
+  ];
+  const exportSummary = [
+    { label: `Entradas ${monthLabel(month)}`, value: BRL(totals.monthIn) },
+    { label: `Saidas ${monthLabel(month)}`, value: BRL(totals.monthOut) },
+    { label: "Resultado do mes", value: BRL(totals.monthNet) },
+    { label: "Saldo total", value: BRL(totals.balance) },
+    { label: "A receber", value: BRL(totals.receivable) },
+    { label: "A pagar", value: BRL(totals.payable) },
+    { label: "Cofre / Investimentos", value: BRL(totals.invested) },
+    { label: `Projecao 12m (CDI ${cdiAnnual.toFixed(2)}%)`, value: BRL(p12.value) },
+  ];
+  const fileBase = `nexus-saldos-${month}-${scope === ALL ? "geral" : scopeLabel.toLowerCase().replace(/\s+/g, "-")}`;
 
   return (
     <section className="space-y-4">
@@ -133,6 +194,22 @@ export function AccountsOverview() {
               <SelectItem value="24">24 meses</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => downloadCsv(fileBase, exportColumns, exportRows)}>
+            <Download className="size-4" /> CSV
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() =>
+              downloadPdf(`Saldos e movimentação · ${monthLabel(month)}`, exportColumns, exportRows, {
+                subtitle: scopeLabel,
+                summary: exportSummary,
+              })
+            }
+          >
+            <FileText className="size-4" /> PDF
+          </Button>
         </div>
       </div>
 
@@ -283,7 +360,10 @@ export function AccountsOverview() {
                   type="number"
                   step="0.1"
                   value={cdiAnnual}
-                  onChange={(e) => setCdiAnnual(Number(e.target.value) || 0)}
+                  onChange={(e) => {
+                    setCdiTouched(true);
+                    setCdiAnnual(Number(e.target.value) || 0);
+                  }}
                 />
               </div>
               <div className="space-y-1.5">
@@ -291,6 +371,28 @@ export function AccountsOverview() {
                 <Input value={`${investCdi.toFixed(0)}%`} readOnly />
               </div>
             </div>
+            <p className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+              {cdiTouched ? (
+                <>
+                  <span>Taxa ajustada manualmente.</span>
+                  <button
+                    type="button"
+                    className="inline-flex items-center gap-1 text-primary hover:underline"
+                    onClick={() => {
+                      setCdiTouched(false);
+                      if (cdiQuery.data?.rate) setCdiAnnual(Number(cdiQuery.data.rate));
+                    }}
+                  >
+                    <RefreshCw className="size-3" /> voltar ao automático
+                  </button>
+                </>
+              ) : (
+                <span>
+                  Atualizada automaticamente pelo Banco Central
+                  {cdiQuery.data?.date ? ` em ${formatDate(cdiQuery.data.date)}` : ""}.
+                </span>
+              )}
+            </p>
             <div className="rounded-lg border border-border/50 bg-surface-2/50 p-3 text-xs">
               <p className="text-muted-foreground">Em 12 meses</p>
               <p className="numeric text-xl font-semibold">{BRL(p12.value)}</p>
