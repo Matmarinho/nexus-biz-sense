@@ -1,0 +1,14 @@
+REVOKE EXECUTE ON FUNCTION public.emit_webhook_event(uuid, text, text, uuid, jsonb) FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.emit_overdue_transactions() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.apply_stock_movement() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.set_updated_at() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.trg_deal_events() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.trg_order_events() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.trg_product_events() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.trg_transaction_events() FROM anon, authenticated, public;
+REVOKE EXECUTE ON FUNCTION public.is_superadmin(uuid) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.tenant_role(uuid) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.is_tenant_member(uuid) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.is_tenant_admin(uuid) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.has_tenant_permission(uuid, text, text) FROM anon;
+REVOKE EXECUTE ON FUNCTION public.has_role(uuid, public.app_role) FROM anon;
